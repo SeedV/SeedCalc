@@ -12,7 +12,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour {
+  private const string _audioSourcePrefix = "Audio";
+  private readonly Dictionary<string, AudioSource> _audioTable =
+      new Dictionary<string, AudioSource>();
+  private const string _buttonClickAudioName = "Click";
+  private Calculator _calculator = null;
+
+  // The UI component of the calculator screen must be associated to this field in Unity.
+  public CalculatorScreen Screen;
+
+  public void OnClickButton(string input) {
+    PlayAudio(_buttonClickAudioName);
+    _calculator.OnInput(input);
+  }
+
+  public void PlayAudio(string name) {
+    if (_audioTable.TryGetValue(name, out var audioSource) && !audioSource.isPlaying) {
+      audioSource.Play();
+    }
+  }
+
+  void Awake() {
+    _calculator = new Calculator(Screen);
+    LocateAudioSources();
+  }
+
+  // Collects all the audio sources that associate with the GameManager instance.
+  private void LocateAudioSources() {
+    foreach (Transform child in transform) {
+      var childObject = child.gameObject;
+      if (childObject.name.StartsWith(_audioSourcePrefix)) {
+        string audioName = childObject.name.Substring(_audioSourcePrefix.Length);
+        var audioSource = childObject.GetComponent<AudioSource>();
+        _audioTable.Add(audioName, audioSource);
+      }
+    }
+  }
 }
