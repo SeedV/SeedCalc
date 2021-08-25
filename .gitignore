@@ -53,8 +53,28 @@ sysinfo.txt
 
 # Builds
 *.apk
+*.aab
+*.app
+*.exe
 *.unitypackage
 
 # Crashlytics generated file
 crashlytics-build.properties
 
+# Packed Addressables
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+
+# Temporary auto-generated Android Assets
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# IL2CPP build artifacts should be ignored
+*BackUpThisFolder_ButDontShipItWithYourGame
+
+# OS specific files
+*DS_Store
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
