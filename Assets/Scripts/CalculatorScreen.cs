@@ -17,8 +17,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 // Controls the UI component of the calculator screen.
-public class CalculatorScreen : MonoBehaviour
-{
+public class CalculatorScreen : MonoBehaviour {
   // Supported error types and messages.
   public enum Error {
     Overflow,
@@ -31,9 +30,6 @@ public class CalculatorScreen : MonoBehaviour
   };
 
   private const string _colorHighlighted = "#f30";
-  private const string _colorNumber = "#333";
-  private const string _colorOperator = "#0c0";
-  private const string _colorParenthesis = "#09f";
   private const string _initialText = "0";
 
   // The font size changes among three choices, depending on the length of the message.

@@ -226,6 +226,11 @@ csharp_style_implicit_object_creation_when_type_is_apparent = false
 # https://github.com/dotnet/roslyn/pull/54259 has been published.
 dotnet_style_allow_statement_immediately_after_block_experimental = false
 
+[Assets/Scripts/*.cs]
+# Unity scripts define internal members like Awake(), Start(), Update() for the engine to invoke.
+# Disable IDE0051: Remove unused private member
+dotnet_diagnostic.IDE0051.severity = none
+
 [src/CodeStyle/**.{cs,vb}]
 # warning RS0005: Do not use generic CodeAction.Create to create CodeAction
 dotnet_diagnostic.RS0005.severity = none
