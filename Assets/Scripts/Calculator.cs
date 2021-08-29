@@ -20,9 +20,7 @@ public class Calculator {
   private readonly CalculatorScreen _screen = null;
   private readonly StringBuilder _cachedInput = new StringBuilder();
 
-  private bool _hasError = false;
-
-  public bool HasError => _hasError;
+  public bool HasError { get; private set; } = false;
 
   public Calculator(CalculatorScreen screen) {
     _screen = screen;
@@ -33,7 +31,7 @@ public class Calculator {
     if (input == CalculatorInput.AllClear) {
       _cachedInput.Clear();
       _screen.Clear();
-      _hasError = false;
+      HasError = false;
     }
     if (HasError) {
       return;
@@ -58,7 +56,7 @@ public class Calculator {
   }
 
   private void ReportError(CalculatorScreen.Error error) {
-    _hasError = true;
+    HasError = true;
     _screen.PrintError(error);
   }
 }

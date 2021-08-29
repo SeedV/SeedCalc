@@ -27,8 +27,8 @@ public static class CalculatorInput {
   public const string Dot = ".";
   public const string Equal = "=";
 
-  // A map from input commands to the corresponding printable strings. Inputs like "AC" or "Del"
-  // have no printable strings.
+  // A map from input commands to the corresponding printable strings. Inputs like "AC", "Del", and
+  // "=" have no printable strings.
   private static readonly Dictionary<string, string> _printableInputs =
       new Dictionary<string, string>();
 
