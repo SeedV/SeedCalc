@@ -13,3 +13,8 @@ file types that are managed with git-lfs.
 
 Please check [ProjectVersion.txt](./ProjectSettings/ProjectVersion.txt) for the
 required version of Unity.
+
+## Contributing
+
+For the developers of SeedCalc, please check out the [contributing
+guide](CONTRIBUTING.md) for guidelines about how to proceed.
