@@ -115,14 +115,14 @@ Shader "Custom/GridShader" {
         return o;
       }
 
-      // Calculates the grid color at a specified uv position. The alpha channel of the returned
-      // color is a grayscale rendering mask, indicating how much the grid color will be blended to
+      // Returns a grayscale rendering mask, indicating how much the grid color will be blended to
       // the main texture.
-      fixed4 GetGridColor(
+      fixed GetGridMask(
           fixed4 gridColor,
           float gridDimension,
           float gridLineWidth,
           float2 uv) {
+        // Calculates the rendering mask for grid lines.
         const float Pi = 3.14159;
         const float GridLineDensity = 3000.0;
         // Scales a periodic curve (y = cos(x)) to the expected period and amplitude, then clips an
@@ -132,7 +132,8 @@ Shader "Custom/GridShader" {
         float2 curve = abs(cos(gridDimension * Pi * (uv - .5)));
         float2 clip = saturate((curve - 1) * density / gridLineWidth + 1);
         float blend = saturate(clip.x + clip.y);
-        return fixed4(gridColor * blend);
+        // Merges the grid line rendering mask and the input alpha channel.
+        return fixed(gridColor.a * blend);
       }
 
       fixed4 frag(v2f i) : SV_Target {
@@ -149,22 +150,22 @@ Shader "Custom/GridShader" {
             _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, halfDir)), _Gloss);
         fixed3 main = ambient + diffuse + specular;
 
-        // Prepares the grid color. The color's alpha channel is a grayscale mask to indicate how
-        // much the grid color will be blended to the main color.
-        fixed4 grid = GetGridColor(_GridColor, _GridDimension, _GridLineWidth, i.uv);
-        fixed4 secondary =
-            GetGridColor(_SecondaryGridColor, _GridDimension * _SecondaryGridDimension,
+        // Prepares the grid masks. A grid mask is a grayscale channel to indicate how much the grid
+        // color will be blended to the main color.
+        fixed4 gridMask = GetGridMask(_GridColor, _GridDimension, _GridLineWidth, i.uv);
+        fixed4 secondaryMask =
+            GetGridMask(_SecondaryGridColor, _GridDimension * _SecondaryGridDimension,
                 _SecondaryGridLineWidth, i.uv);
 
-        // Blends the main color, the primary grid color, and the secondary grid color. The alpha
-        // channels (masks) of the two grids control the priorities of the three colors:
+        // Blends the main color, the primary grid color, and the secondary grid color. The grid
+        // masks control the priorities of the three colors:
         //
         // - The primary grid color overrides the other two colors.
         // - The secondary grid color overrids the main color.
         fixed3 blend =
-            saturate(grid.rgb * grid.a +
-                secondary.rgb * secondary.a * (1 - grid.a) +
-                main * (1 - grid.a) * (1 - secondary.a));
+            saturate(_GridColor.rgb * gridMask.a +
+                _SecondaryGridColor.rgb * secondaryMask.a * (1 - gridMask.a) +
+                main * (1 - gridMask.a) * (1 - secondaryMask.a));
 
         return fixed4(blend, texColor.a * _Color.a);
       }
