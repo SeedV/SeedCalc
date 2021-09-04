@@ -124,7 +124,8 @@ Shader "Custom/GridShader" {
         const float Pi = 3.14159;
         const float GridLineDensity = 3000.0;
         // Scales a periodic curve (y = cos(x)) to the expected period and amplitude, then clips an
-        // arc out of each period of the curve.
+        // arc out of each period of the curve. The clipped arc‘s width is not strictly proportional
+        // to the gridLineWidth argument but the result is good enough.
         float density = GridLineDensity / gridDimension;
         float2 curve = abs(cos(gridDimension * Pi * (uv - .5)));
         float2 clip = saturate((curve - 1) * density / gridLineWidth + 1);
