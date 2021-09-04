@@ -17,7 +17,7 @@
 // The properties of the primary and secondary grids can be configured via Unity's inspector window.
 //
 // The properties can also be set by C# scripts during runtime. For example, the following code
-// shows a zoom-in animation effect to scale the primary grid from size=10 to size=1:
+// shows a zoom-in animation effect to scale the primary grid from 10x10 to 1x1:
 //
 //  public void ZoomIn() {
 //    StartCoroutine(ZoomInAnim());
@@ -25,7 +25,8 @@
 //
 //  private IEnumerator ZoomInAnim() {
 //    for (int scale = 10; scale > 0; scale--) {
-//      GetComponent<Renderer>().material.SetFloat("_GridSize", scale);
+//      GetComponent<Renderer>().material.SetFloat("_GridDimension", scale);
+//      yield return new WaitForSeconds(0.1f);
 //    }
 //  }
 Shader "Custom/GridShader" {
@@ -44,9 +45,9 @@ Shader "Custom/GridShader" {
     // The alpha channel of _GridColor defines how much the grid color is blended into the main
     // texture.
     _GridColor("Grid Color", Color) = (1, 1, 1, 1)
-    // _GridSize indicates the cell number along each axis in the uv space. The primary grid will be
-    // turned off if it is set to zero.
-    _GridSize("Grid Size", Range(0.0, 30.0)) = 10.0
+    // _GridDimension indicates the number of rows and columns of the primary grid. The primary grid
+    // will be turned off if it is set to zero.
+    _GridDimension("Grid Dimension", Range(0.0, 30.0)) = 10.0
     // The line width of the primary grid.
     _GridLineWidth("Grid Line Width", Range(1.0, 50.0)) = 2.0
 
@@ -55,9 +56,9 @@ Shader "Custom/GridShader" {
     // The alpha channel of _SecondaryGridColor defines how much the secondary grid color is blended
     // into the main texture.
     _SecondaryGridColor("Secondary Grid Color", Color) = (1, 1, 1, 1)
-    // _SecondaryGridSize indicates the cell number along each axis inside a primary grid cell. The
+    // _SecondaryGridDimension indicates the number of rows and columns of the secondary grid. The
     // secondary grid will be turned off if it is set to zero.
-    _SecondaryGridSize("Secondary Grid Size", Range(0.0, 10.0)) = 0.0
+    _SecondaryGridDimension("Secondary Grid Dimension", Range(0.0, 10.0)) = 0.0
     // The line width of the secondary grid.
     _SecondaryGridLineWidth("Secondary Grid Line Width", Range(1.0, 50.0)) = 1.0
   }
@@ -100,10 +101,10 @@ Shader "Custom/GridShader" {
       float _Gloss;
       fixed4 _GridColor;
       float _GridLineWidth;
-      float _GridSize;
+      float _GridDimension;
       fixed4 _SecondaryGridColor;
       float _SecondaryGridLineWidth;
-      float _SecondaryGridSize;
+      float _SecondaryGridDimension;
 
       v2f vert(a2v v) {
         v2f o;
@@ -117,15 +118,15 @@ Shader "Custom/GridShader" {
       // Calculates the grid color at a specified uv position.
       fixed4 GetGridColor(
           fixed4 gridColor,
-          float gridSize,
+          float gridDimension,
           float gridLineWidth,
           float2 uv) {
         const float Pi = 3.14159;
         const float GridLineDensity = 3000.0;
         // Scales a periodic curve (y = cos(x)) to the expected period and amplitude, then clips an
         // arc out of each period of the curve.
-        float density = GridLineDensity / gridSize;
-        float2 curve = abs(cos(gridSize * Pi * (uv - .5)));
+        float density = GridLineDensity / gridDimension;
+        float2 curve = abs(cos(gridDimension * Pi * (uv - .5)));
         float2 clip = saturate((curve - 1) * density / gridLineWidth + 1);
         float blend = saturate(clip.x + clip.y);
         fixed3 color = gridColor.rgb * blend;
@@ -154,10 +155,10 @@ Shader "Custom/GridShader" {
 
         // Prepares a grid color and a grayscale mask. The value of the mask indicates how much the
         // grid color will be blended to the main color.
-        fixed4 grid = GetGridColor(_GridColor, _GridSize, _GridLineWidth, i.uv);
+        fixed4 grid = GetGridColor(_GridColor, _GridDimension, _GridLineWidth, i.uv);
         fixed gridMask = grid.a * Max3(grid);
         fixed4 secondary =
-            GetGridColor(_SecondaryGridColor, _GridSize * _SecondaryGridSize,
+            GetGridColor(_SecondaryGridColor, _GridDimension * _SecondaryGridDimension,
                 _SecondaryGridLineWidth, i.uv);
         fixed secondaryMask = secondary.a * Max3(secondary);
 
