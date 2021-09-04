@@ -135,11 +135,6 @@ Shader "Custom/GridShader" {
         return fixed4(gridColor * blend);
       }
 
-      // Returns the max number among the three components of a vector.
-      float Max3(fixed3 v) {
-        return max(max(v.x, v.y), v.z);
-      }
-
       fixed4 frag(v2f i) : SV_Target {
         // Texture and lighting calculation for a specular surface.
         fixed3 worldNormal = normalize(i.worldNormal);
@@ -167,8 +162,8 @@ Shader "Custom/GridShader" {
         // - The primary grid color overrides the other two colors.
         // - The secondary grid color overrids the main color.
         fixed3 blend =
-            saturate(grid.rgb +
-                secondary.rgb * (1 - grid.a) +
+            saturate(grid.rgb * grid.a +
+                secondary.rgb * secondary.a * (1 - grid.a) +
                 main * (1 - grid.a) * (1 - secondary.a));
 
         return fixed4(blend, texColor.a * _Color.a);
