@@ -132,7 +132,7 @@ Shader "Custom/GridShader" {
         float2 curve = abs(cos(gridDimension * Pi * (uv - .5)));
         float2 clip = saturate((curve - 1) * density / gridLineWidth + 1);
         float blend = saturate(clip.x + clip.y);
-        // Merges the grid line rendering mask and the input alpha channel.
+        // Merges the grid line rendering mask with the input alpha channel.
         return fixed(gridColor.a * blend);
       }
 
