@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour {
     // Binds the ViewModel class to all View classes.
     _calculator = new Calculator();
     _calculator.Bind(
-        "Error", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
+        "State", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
     _calculator.Bind(
         "Content", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorContentUpdated));
   }

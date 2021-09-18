@@ -118,10 +118,7 @@ namespace AgileMvvm {
     // Utility method for concrete ViewModel classes to implement bound properties' setters.
     protected void MvvmSetter<TProperty>(
         ref TProperty field, TProperty value, [CallerMemberName] string propertyName = "") {
-      PropertyInfo property = GetType().GetProperty(propertyName);
-      if (property is null) {
-        throw new ArgumentException($"Property \"{propertyName}\" not found.");
-      }
+      PropertyInfo property = GetPropertyInfo(this, propertyName);
       field = value;
       RaisePropertyUpdated(property, value);
     }
