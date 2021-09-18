@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using AgileMvvm;
 
 public class GameManager : MonoBehaviour {
   private const string _audioSourcePrefix = "Audio";
@@ -37,8 +39,13 @@ public class GameManager : MonoBehaviour {
   }
 
   void Awake() {
-    _calculator = new Calculator(Screen);
     LocateAudioSources();
+    // Binds the ViewModel class to all View classes.
+    _calculator = new Calculator();
+    _calculator.Bind(
+        "Error", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
+    _calculator.Bind(
+        "Content", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorContentUpdated));
   }
 
   // Collects all the audio sources that associate with the GameManager instance.
