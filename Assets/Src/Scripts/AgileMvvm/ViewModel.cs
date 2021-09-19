@@ -93,6 +93,11 @@ namespace AgileMvvm {
     // delegate.
     public void Bind(string viewModelPropertyName, object view, string viewPropertyName) {
       var viewModelProperty = GetPropertyInfo(this, viewModelPropertyName);
+      if (!Attribute.IsDefined(viewModelProperty, typeof(BindablePropertyAttribute))) {
+        throw new ArgumentException(
+            $"ViewModel's property \"{viewModelPropertyName}\" has no [BindableProperty] " +
+            "attribute.");
+      }
       var sourceType = viewModelProperty.PropertyType;
       var viewProperty = GetPropertyInfo(view, viewPropertyName);
       var targetType = viewProperty.PropertyType;

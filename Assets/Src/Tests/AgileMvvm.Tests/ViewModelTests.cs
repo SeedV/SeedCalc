@@ -52,6 +52,8 @@ namespace AgileMvvm.Tests {
       get => _cat;
       set => MvvmSetter(ref _cat, value);
     }
+
+    public string NotBindableProp { get; set; }
   }
 
   class MyView1 {
@@ -77,10 +79,11 @@ namespace AgileMvvm.Tests {
           viewModel.Bind(
               "InvalidName",
               (object sender, UpdatedEvent.Args e) => view.StrProp = e.Value.ToString()));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("StringProp", view, "IntProp"));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("IntProp", view, "StringProp"));
+      Assert.Throws<ArgumentException>(() => viewModel.Bind("StrProp", view, "IntProp"));
+      Assert.Throws<ArgumentException>(() => viewModel.Bind("IntProp", view, "StrProp"));
       Assert.Throws<ArgumentException>(() => viewModel.Bind("IntProp", view, "FloatProp"));
       Assert.Throws<ArgumentException>(() => viewModel.Bind("FloatProp", view, "IntProp"));
+      Assert.Throws<ArgumentException>(() => viewModel.Bind("NotBindableProp", view, "StrProp"));
     }
 
     [Test]
