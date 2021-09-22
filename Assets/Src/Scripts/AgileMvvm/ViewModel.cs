@@ -23,11 +23,8 @@ namespace AgileMvvm {
   // In AgileMvvm, the relationships among View, ViewModel and Model are:
   //
   // * The Model does not know about the View or the ViewModel.
-  // * The View does not know about the Model, but knows the ViewModel.
-  // * The View may own the ViewModel, but it is not necessary to do that. The View can communicate
-  //   with the ViewModel via lightweight bindings even when it doesn't own the ViewModel.
-  // * The binding relationships between the View and the ViewModel can be set up either by the View
-  //   itself, or by the Application class, the GameManager class, etc.
+  // * The View does not know about the Model.
+  // * The View and the ViewModel communicate with each other with bindings.
   // * Different Views or multiple View instances can be bound to the same ViewModel.
   // * The ViewModel does not know about the View, but knows and maintains the Model.
   //
@@ -43,7 +40,8 @@ namespace AgileMvvm {
   //
   // * Defines your own ViewModel class and implement bindable properties like below:
   //
-  //    class Person : ViewModel {
+  //    class PersonViewModel : ViewModel {
+  //      private System.Data.DataTable _table;  // Example Model instance owned by ViewModel.
   //      private string _name;
   //      [BindableProperty]
   //      public string Name {
@@ -61,8 +59,8 @@ namespace AgileMvvm {
   // * Binds the bindable property of the ViewModel to the target property of the View class:
   //
   //    var dialog = new Dialog();
-  //    var person = new Person();
-  //    person.Bind("Name", dialog, "TextField");
+  //    var personViewModel = new PersonViewModel();
+  //    personViewModel.Bind(nameof(personViewModel.Name), dialog, nameof(dialog.TextField));
   //
   // That's it! Any subsequent changes of the ViewModel's bound property will update the View's
   // property.
@@ -70,8 +68,8 @@ namespace AgileMvvm {
   // * Or, you can define your own event handler if you want to customize the binding behavior:
   //
   //    var dialog = new Dialog();
-  //    var person = new Person();
-  //    person.Bind("Name", (object sender, UpdatedEvent.Args e) => {
+  //    var personViewModel = new PersonViewModel();
+  //    person.Bind(nameof(personViewModel.Name), (object sender, UpdatedEvent.Args e) => {
   //      dialog.TextField = e.Value.ToString();
   //    });
   //

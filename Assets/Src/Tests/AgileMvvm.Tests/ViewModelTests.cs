@@ -79,22 +79,27 @@ namespace AgileMvvm.Tests {
           viewModel.Bind(
               "InvalidName",
               (object sender, UpdatedEvent.Args e) => view.StrProp = e.Value.ToString()));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("StrProp", view, "IntProp"));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("IntProp", view, "StrProp"));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("IntProp", view, "FloatProp"));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("FloatProp", view, "IntProp"));
-      Assert.Throws<ArgumentException>(() => viewModel.Bind("NotBindableProp", view, "StrProp"));
+      Assert.Throws<ArgumentException>(
+          () => viewModel.Bind(nameof(viewModel.StrProp), view, nameof(view.IntProp)));
+      Assert.Throws<ArgumentException>(
+          () => viewModel.Bind(nameof(viewModel.IntProp), view, nameof(view.StrProp)));
+      Assert.Throws<ArgumentException>(
+          () => viewModel.Bind(nameof(viewModel.IntProp), view, nameof(view.FloatProp)));
+      Assert.Throws<ArgumentException>(
+          () => viewModel.Bind(nameof(viewModel.FloatProp), view, nameof(view.IntProp)));
+      Assert.Throws<ArgumentException>(
+          () => viewModel.Bind(nameof(viewModel.NotBindableProp), view, nameof(view.StrProp)));
     }
 
     [Test]
     public void TestSameTypeOneWayBindings() {
       var viewModel = new MyViewModel();
       var view = new MyView1();
-      viewModel.Bind("StrProp", view, "StrProp");
+      viewModel.Bind(nameof(viewModel.StrProp), view, nameof(view.StrProp));
       viewModel.StrProp = "Hello";
       Assert.AreEqual("Hello", view.StrProp);
 
-      viewModel.Bind("FloatProp", view, "FloatProp");
+      viewModel.Bind(nameof(viewModel.FloatProp), view, nameof(view.FloatProp));
       viewModel.FloatProp = 3.14f;
       Assert.AreEqual(3.14f, view.FloatProp);
 
@@ -107,7 +112,7 @@ namespace AgileMvvm.Tests {
     public void TestAssignableTypeOneWayBindings() {
       var viewModel = new MyViewModel();
       var view = new MyView1();
-      viewModel.Bind("CatProp", view, "AnimalProp");
+      viewModel.Bind(nameof(viewModel.CatProp), view, nameof(view.AnimalProp));
       viewModel.CatProp = new Cat { Name = "Tom" };
       Assert.AreEqual("Tom", view.AnimalProp.Name);
     }
@@ -118,9 +123,9 @@ namespace AgileMvvm.Tests {
       var view1 = new MyView1();
       var view2 = new MyView2();
 
-      viewModel.Bind("StrProp", view1, "StrProp");
-      viewModel.Bind("StrProp", view2, "StrProp1");
-      viewModel.Bind("StrProp", view2, "StrProp2");
+      viewModel.Bind(nameof(viewModel.StrProp), view1, nameof(view1.StrProp));
+      viewModel.Bind(nameof(viewModel.StrProp), view2, nameof(view2.StrProp1));
+      viewModel.Bind(nameof(viewModel.StrProp), view2, nameof(view2.StrProp2));
 
       viewModel.StrProp = "Hello";
       Assert.AreEqual("Hello", view1.StrProp);

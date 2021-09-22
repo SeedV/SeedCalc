@@ -35,7 +35,7 @@ public static class ErrorMessageHelper {
 }
 
 // The calculator class. It is a ViewModel class that manages the underlying calculation states,
-// e.g., via a SeedLang engine.
+// e.g., via a SeedLang executor.
 public class Calculator : ViewModel {
   private const int _maxChars = 100;
   private readonly StringBuilder _cachedInput = new StringBuilder();

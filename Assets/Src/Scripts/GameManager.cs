@@ -43,9 +43,11 @@ public class GameManager : MonoBehaviour {
     // Binds the ViewModel class to all View classes.
     _calculator = new Calculator();
     _calculator.Bind(
-        "State", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
+        nameof(_calculator.State),
+        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
     _calculator.Bind(
-        "Content", new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorContentUpdated));
+        nameof(_calculator.Content),
+        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorContentUpdated));
   }
 
   // Collects all the audio sources that associate with the GameManager instance.
