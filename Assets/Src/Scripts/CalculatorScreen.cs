@@ -12,23 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using AgileMvvm;
 
-// Controls the UI component of the calculator screen.
+// The UI component of the calculator screen.
 public class CalculatorScreen : MonoBehaviour {
-  // Supported error types and messages.
-  public enum Error {
-    Overflow,
-  }
   private const string _errPrefix = "ERR:";
-  private static readonly Dictionary<Error, string> _errorMessages =
-      new Dictionary<Error, string>() {
-    // All the display error messages must be in upper cases, length <= 8.
-    { Error.Overflow, "OVERFLOW" },
-  };
-
   private const string _colorHighlighted = "#f30";
   private const string _initialText = "0";
 
@@ -47,10 +37,9 @@ public class CalculatorScreen : MonoBehaviour {
   }
 
   // Prints an error message.
-  public void PrintError(Error error) {
-    string message = _errorMessages[error];
+  public void PrintError(string errorMessage) {
     var text = GetComponent<Text>();
-    text.text = $"{_errPrefix}<color={_colorHighlighted}>{message}</color>";
+    text.text = $"{_errPrefix}<color={_colorHighlighted}>{errorMessage.ToUpper()}</color>";
     text.fontSize = _fontSizes[0].fontSize;
   }
 
@@ -69,6 +58,18 @@ public class CalculatorScreen : MonoBehaviour {
         }
       }
     }
+  }
+
+  public void OnCalculatorErrorUpdated(object sender, UpdatedEvent.Args args) {
+    if (args.Value is CalculatorState state) {
+      if (state.IsError()) {
+        PrintError(state.ToString());
+      }
+    }
+  }
+
+  public void OnCalculatorContentUpdated(object sender, UpdatedEvent.Args args) {
+    Print(args.Value.ToString());
   }
 
   void Awake() {

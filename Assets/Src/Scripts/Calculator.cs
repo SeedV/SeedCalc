@@ -12,51 +12,73 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Text;
+using AgileMvvm;
 
-// The calculator that executes input expressions.
-public class Calculator {
+// The supported calculator states.
+public enum CalculatorState {
+  Okay,
+  Overflow,
+}
+
+public static class ErrorMessageHelper {
+  public static string ToString(this CalculatorState state) {
+    return Enum.GetName(typeof(CalculatorState), state);
+  }
+  public static bool IsOk(this CalculatorState state) {
+    return state == CalculatorState.Okay;
+  }
+  public static bool IsError(this CalculatorState state) {
+    return !IsOk(state);
+  }
+}
+
+// The calculator class. It is a ViewModel class that manages the underlying calculation states,
+// e.g., via a SeedLang executor.
+public class Calculator : ViewModel {
   private const int _maxChars = 100;
-  private readonly CalculatorScreen _screen = null;
   private readonly StringBuilder _cachedInput = new StringBuilder();
+  private CalculatorState _state;
+  private string _content;
 
-  public bool HasError { get; private set; } = false;
+  [BindableProperty]
+  public CalculatorState State {
+    get => _state;
+    set => MvvmSetter(ref _state, value);
+  }
 
-  public Calculator(CalculatorScreen screen) {
-    _screen = screen;
+  [BindableProperty]
+  public string Content {
+    get => _content;
+    set => MvvmSetter(ref _content, value);
   }
 
   public void OnInput(string input) {
     // If the calculator is in an error state, only the "AC" button can reset it.
     if (input == CalculatorInput.AllClear) {
       _cachedInput.Clear();
-      _screen.Clear();
-      HasError = false;
+      Content = "";
+      State = CalculatorState.Okay;
     }
-    if (HasError) {
+    if (State.IsError()) {
       return;
     }
-
     if (CalculatorInput.TryGetPrintable(input, out string printable)) {
       _cachedInput.Append(printable);
       if (_cachedInput.Length > _maxChars) {
-        ReportError(CalculatorScreen.Error.Overflow);
+        State = CalculatorState.Overflow;
       } else {
         // TODO: invoke the underlying SeedLang engine to validate the cached expression.
-        _screen.Print(_cachedInput.ToString());
+        Content = _cachedInput.ToString();
       }
     } else if (input == CalculatorInput.Del) {
       if (_cachedInput.Length > 0) {
         _cachedInput.Remove(_cachedInput.Length - 1, 1);
       }
-      _screen.Print(_cachedInput.ToString());
+      Content = _cachedInput.ToString();
     } else if (input == CalculatorInput.Equal) {
       // TODO: invoke the underlying SeedLang engine to executed the cached expression.
     }
-  }
-
-  private void ReportError(CalculatorScreen.Error error) {
-    HasError = true;
-    _screen.PrintError(error);
   }
 }
