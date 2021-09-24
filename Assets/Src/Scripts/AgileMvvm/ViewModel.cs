@@ -46,7 +46,7 @@ namespace AgileMvvm {
   //      [BindableProperty]
   //      public string Name {
   //        get => _name;
-  //        set => MvvmSetter(ref _s, value);
+  //        set => MvvmSetter(ref _name, value);
   //      }
   //    }
   //
