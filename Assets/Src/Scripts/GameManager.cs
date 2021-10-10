@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using AgileMvvm;
+using SeedCalc;
 
 public class GameManager : MonoBehaviour {
   private const string _audioSourcePrefix = "Audio";
@@ -44,10 +45,10 @@ public class GameManager : MonoBehaviour {
     _calculator = new Calculator();
     _calculator.Bind(
         nameof(_calculator.State),
-        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorErrorUpdated));
+        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorStateUpdated));
     _calculator.Bind(
-        nameof(_calculator.Content),
-        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorContentUpdated));
+        nameof(_calculator.DisplayContent),
+        new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorDisplayTokensUpdated));
   }
 
   // Collects all the audio sources that associate with the GameManager instance.
