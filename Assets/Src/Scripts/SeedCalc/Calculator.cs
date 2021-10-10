@@ -72,23 +72,29 @@ namespace SeedCalc {
   // The calculator class. It is a ViewModel class that manages the underlying calculation states,
   // e.g., via a SeedLang executor.
   public class Calculator : ViewModel {
-    private class Visualizer : IVisualizer<BinaryEvent> {
+    private class Visualizer : IVisualizer<BinaryEvent>, IVisualizer<EvalEvent> {
       // The code range that is under execution.
       public TextRange SourceRange { get; private set; }
       // The result of the current execution step.
       public IValue Result { get; private set; }
 
       public void On(BinaryEvent be) {
-        Debug.Log($"{be.Left} {be.Op} {be.Right} = {be.Result}");
         if (be.Range is TextRange range) {
           SourceRange = range;
         }
         Result = be.Result;
       }
+
+      public void On(EvalEvent ee) {
+        if (ee.Range is TextRange range) {
+          SourceRange = range;
+        }
+        Result = ee.Value;
+      }
     }
 
-    public const string ModuleName = "SeedCalc";
-    public const string EvalPrefix = "eval ";
+    private const string _moduleName = "SeedCalc";
+    private const string _evalPrefix = "eval ";
 
     [BindableProperty]
     public CalculatorState State {
@@ -122,8 +128,8 @@ namespace SeedCalc {
             break;
           case CalculatorInput.Equal:
           default:
-            // No printable input nor the Equal key is accepted if the calculator is in an error
-            // state.
+            // Neither a printable input nor the Equal key is accepted if the calculator is in an
+            // error state.
             break;
         }
       } else {
@@ -189,11 +195,9 @@ namespace SeedCalc {
         DisplayContent = null;
         return;
       }
-
-      // Parsing the cached text.
       var collection = new DiagnosticCollection();
       var executor = new Executor();
-      executor.Parse(expression, ModuleName, SeedXLanguage.Python, collection);
+      executor.Parse(expression, _moduleName, SeedXLanguage.Python, collection);
       DisplayContent = new DisplayContent(expression, executor.SyntaxTokens, null);
     }
 
@@ -206,10 +210,10 @@ namespace SeedCalc {
       }
 
       // For now SeedPython only executes full "eval" statements.
-      string source = EvalPrefix + " " + expression;
+      string source = _evalPrefix + " " + expression;
       var executor = new Executor();
       var collection = new DiagnosticCollection();
-      if (!executor.Parse(source, ModuleName, SeedXLanguage.Python, collection)) {
+      if (!executor.Parse(source, _moduleName, SeedXLanguage.Python, collection)) {
         State = CalculatorState.Syntax;
         return;
       }
@@ -217,8 +221,6 @@ namespace SeedCalc {
       executor.Register(visualizer);
       executor.Run(RunType.Ast);
       executor.Unregister(visualizer);
-
-      Debug.Log(visualizer.Result);
 
       string resultText = visualizer.Result.ToString();
       var resultRange = new TextRange(1, 0, 1, resultText.Length - 1);

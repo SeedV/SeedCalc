@@ -19,8 +19,16 @@ namespace SeedCalc.Tests {
     [Test]
     public void TestCalculator() {
       var calculator = new Calculator();
-
       Assert.True(calculator.State.IsOk());
+
+      calculator.OnInput("1");
+      calculator.OnInput("=");
+      Assert.AreEqual("1", calculator.DisplayContent.Expression);
+      Assert.True(calculator.State.IsOk());
+      calculator.OnInput("AC");
+      Assert.IsNull(calculator.DisplayContent);
+      Assert.True(calculator.State.IsOk());
+
       calculator.OnInput("1");
       Assert.AreEqual("1", calculator.DisplayContent.Expression);
       calculator.OnInput("+");
@@ -32,17 +40,13 @@ namespace SeedCalc.Tests {
       Assert.AreEqual("3", calculator.DisplayContent.Expression);
       Assert.True(calculator.State.IsOk());
       calculator.OnInput("AC");
-      Assert.IsNull(calculator.DisplayContent);
-      Assert.True(calculator.State.IsOk());
 
       calculator.OnInput("1");
       calculator.OnInput("+");
       calculator.OnInput("=");
       Assert.True(calculator.State.IsError());
       Assert.AreEqual(CalculatorState.Syntax, calculator.State);
-
       calculator.OnInput("AC");
-      Assert.True(calculator.State.IsOk());
 
       for (int i = 0; i < 100; i++) {
         calculator.OnInput("9");
