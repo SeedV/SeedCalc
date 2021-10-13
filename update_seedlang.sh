@@ -31,15 +31,19 @@ if [[ ! -d "${TEMP_PLUGINS_DIR}" ]]; then
   mkdir "${TEMP_PLUGINS_DIR}"
 fi
 
-# Updates SeedLang.dll from NuGet. To keep this script simple, no dependecny
-# checking is done for now.
+# Updates SeedLang.dll from NuGet. To keep this script lightweight, no
+# dependency checking is done here. Please manually update other DLLs if
+# SeedLang's dependencies have changed. Or, consider using a relatively
+# heavyweight solution, such as NuGetForUnity:
+# https://github.com/GlitchEnzo/NuGetForUnity.
+echo "Fetching the latest version number from NuGet ..."
 readonly SEEDLANG_VERSION=`nuget list SeedLang -PreRelease | head -n 1`
-echo "Updating: ${SEEDLANG_VERSION} ..."
+echo "Updating ${SEEDLANG_VERSION} ..."
 readonly SEEDLANG_PATH="${SEEDLANG_VERSION/ //}"
 readonly SEEDLANG_PACKAGE="${TEMP_PLUGINS_DIR}/SeedLang.nuget.zip"
-curl -L "https://www.nuget.org/api/v2/package/${SEEDLANG_PATH}" \
+curl -s -L "https://www.nuget.org/api/v2/package/${SEEDLANG_PATH}" \
   -o "${SEEDLANG_PACKAGE}"
-unzip "${SEEDLANG_PACKAGE}" -d "${TEMP_PLUGINS_DIR}"
+unzip -q "${SEEDLANG_PACKAGE}" -d "${TEMP_PLUGINS_DIR}"
 readonly SEEDLANG_DLL="${TEMP_PLUGINS_DIR}/lib/netstandard2.0/SeedLang.dll"
 readonly SEEDLANG_VERSION_FILE="${PLUGINS_DIR}/SeedLang.version.txt"
 chmod 640 "${SEEDLANG_DLL}"
