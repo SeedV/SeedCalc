@@ -15,10 +15,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 using AgileMvvm;
-using SeedLang.Runtime;
 using SeedLang.Common;
+using SeedLang.Runtime;
 
 namespace SeedCalc {
   // The supported states of the calculator.
@@ -95,6 +94,7 @@ namespace SeedCalc {
 
     private const string _moduleName = "SeedCalc";
     private const string _evalPrefix = "eval ";
+    private const int _maxChars = 100;
 
     [BindableProperty]
     public CalculatorState State {
@@ -109,7 +109,6 @@ namespace SeedCalc {
     }
 
     private CalculatorState _state;
-    private const int _maxChars = 100;
     private readonly StringBuilder _cachedInput = new StringBuilder();
     private DisplayContent _displayContent = null;
 
@@ -150,7 +149,9 @@ namespace SeedCalc {
               Append(CalculatorInput.N0);
             }
             Append(CalculatorInput.Dot);
-            Parse();
+            if (State.IsOk()) {
+              Parse();
+            }
             break;
           default:
             Append(input);

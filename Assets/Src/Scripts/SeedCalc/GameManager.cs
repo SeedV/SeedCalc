@@ -20,9 +20,9 @@ using AgileMvvm;
 namespace SeedCalc {
   public class GameManager : MonoBehaviour {
     private const string _audioSourcePrefix = "Audio";
+    private const string _buttonClickAudioName = "Click";
     private readonly Dictionary<string, AudioSource> _audioTable =
         new Dictionary<string, AudioSource>();
-    private const string _buttonClickAudioName = "Click";
     private Calculator _calculator = null;
 
     // The UI component of the calculator screen must be associated to this field in Unity.

@@ -17,7 +17,6 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using AgileMvvm;
-using SeedCalc;
 using SeedLang.Common;
 
 namespace SeedCalc {
@@ -58,8 +57,8 @@ namespace SeedCalc {
       _text.fontSize = _fontSizes[0].fontSize;
     }
 
-    // Prints a message. The parameter plainTextLength specifies the plain text length of message,
-    // excluding style tags such as "<color=...>".
+    // Prints a message. The parameter plainTextLength specifies the plain text length of the
+    // message, excluding style tags such as "<color=...>".
     public void Print(string message, int plainTextLength) {
       if (string.IsNullOrEmpty(message)) {
         _text.text = $"<color={_colorNumber}>{_initialText}</color>";

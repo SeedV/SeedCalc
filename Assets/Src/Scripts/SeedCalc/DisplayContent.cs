@@ -17,7 +17,7 @@ using SeedLang.Common;
 
 namespace SeedCalc {
   // The content for the calculator screen to display. The contnet will also be bound to the
-  // visualization pane so that the expression or the last number can be visualized.
+  // visualization panel so that the expression or the last number can be visualized.
   public class DisplayContent {
     // The input expression in plain text format. Incomplete expressions are accepted since the
     // calculator screen can syntax highlight the tokens before user finishes the expression.
