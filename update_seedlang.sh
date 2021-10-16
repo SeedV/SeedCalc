@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# A simple script to manually update the SeedLang dll to the newest version.
+# A simple script to manually update the SeedLang dll to the latest version.
 #
 # Pre-requisites
 #
-# NuGet client tools:
+# Install NuGet client tools:
 # https://docs.microsoft.com/en-us/nuget/install-nuget-client-tools
 
 # Sets up.
@@ -37,6 +37,7 @@ fi
 # heavyweight solution, such as NuGetForUnity:
 # https://github.com/GlitchEnzo/NuGetForUnity.
 echo "Fetching the latest version number from NuGet ..."
+# Including pre-release versions for the dev stage.
 readonly SEEDLANG_VERSION=`nuget list SeedLang -PreRelease | head -n 1`
 echo "Updating ${SEEDLANG_VERSION} ..."
 readonly SEEDLANG_PATH="${SEEDLANG_VERSION/ //}"
@@ -45,10 +46,12 @@ curl -s -L "https://www.nuget.org/api/v2/package/${SEEDLANG_PATH}" \
   -o "${SEEDLANG_PACKAGE}"
 unzip -q "${SEEDLANG_PACKAGE}" -d "${TEMP_PLUGINS_DIR}"
 readonly SEEDLANG_DLL="${TEMP_PLUGINS_DIR}/lib/netstandard2.0/SeedLang.dll"
+echo "Recoding the updated version number ..."
 readonly SEEDLANG_VERSION_FILE="${PLUGINS_DIR}/SeedLang.version.txt"
 chmod 640 "${SEEDLANG_DLL}"
 cp "${SEEDLANG_DLL}" "${PLUGINS_DIR}"
 echo "${SEEDLANG_VERSION}" > "${SEEDLANG_VERSION_FILE}"
+echo "Done."
 
 # Clears temp files.
 if [[ -d "${TEMP_PLUGINS_DIR}" ]]; then
