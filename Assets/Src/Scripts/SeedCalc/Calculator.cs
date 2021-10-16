@@ -220,14 +220,27 @@ namespace SeedCalc {
       }
       var visualizer = new Visualizer();
       executor.Register(visualizer);
-      executor.Run(RunType.Ast);
+      collection = new DiagnosticCollection();
+      executor.Run(RunType.Ast, collection);
       executor.Unregister(visualizer);
 
-      string resultText = visualizer.Result.ToString();
-      var resultRange = new TextRange(1, 0, 1, resultText.Length - 1);
-      var resultToken = new SyntaxToken(SyntaxType.Number, resultRange);
-      var resultTokens = new List<SyntaxToken> { resultToken };
-      DisplayContent = new DisplayContent(resultText, resultTokens, null);
+      if (collection.Diagnostics.Count > 0) {
+        switch (collection.Diagnostics[0].MessageId) {
+          case Message.RuntimeErrorDivideByZero:
+            State = CalculatorState.DivBy0;
+            break;
+          case Message.RuntimeOverflow:
+          default:
+            State = CalculatorState.Overflow;
+            break;
+        }
+      } else {
+        string resultText = visualizer.Result.ToString();
+        var resultRange = new TextRange(1, 0, 1, resultText.Length - 1);
+        var resultToken = new SyntaxToken(SyntaxType.Number, resultRange);
+        var resultTokens = new List<SyntaxToken> { resultToken };
+        DisplayContent = new DisplayContent(resultText, resultTokens, null);
+      }
       _cachedInput.Clear();
     }
   }
