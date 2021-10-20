@@ -40,14 +40,34 @@ namespace SeedCalc.Tests {
       Assert.AreEqual("3", calculator.DisplayContent.Expression);
       Assert.True(calculator.State.IsOk());
       calculator.OnInput("AC");
+    }
 
+    [Test]
+    public void TestSyntaxError() {
+      var calculator = new Calculator();
       calculator.OnInput("1");
       calculator.OnInput("+");
       calculator.OnInput("=");
       Assert.True(calculator.State.IsError());
       Assert.AreEqual(CalculatorState.Syntax, calculator.State);
       calculator.OnInput("AC");
+    }
 
+    [Test]
+    public void TestDivByZero() {
+      var calculator = new Calculator();
+      calculator.OnInput("1");
+      calculator.OnInput("/");
+      calculator.OnInput("0");
+      calculator.OnInput("=");
+      Assert.True(calculator.State.IsError());
+      Assert.AreEqual(CalculatorState.DivBy0, calculator.State);
+      calculator.OnInput("AC");
+    }
+
+    [Test]
+    public void TestInputOverflow() {
+      var calculator = new Calculator();
       for (int i = 0; i < 100; i++) {
         calculator.OnInput("9");
       }
