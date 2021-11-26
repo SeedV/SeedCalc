@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: b0aab2175519b475f9885e8746912554
+guid: 3585fe94b065049e18da4d28ce841d89
 TrueTypeFontImporter:
   externalObjects: {}
   serializedVersion: 4
@@ -9,7 +9,7 @@ TrueTypeFontImporter:
   characterPadding: 1
   includeFontData: 1
   fontNames:
-  - Roboto Mono
+  - Fira Sans Condensed
   fallbackFontReferences: []
   customCharacters: 
   fontRenderingMode: 0
