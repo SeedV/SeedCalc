@@ -28,8 +28,8 @@ namespace SeedCalc {
 
     public void UpdateValue(double maxValueOfCurrentLevel, double value) {
       Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
-      if (VisualizableNumbers.TryFormatVisualizableValue(value, out string s)) {
-        IndicatorValue.text = s;
+      if (VisualizableNumber.IsVisualizable(value)) {
+        IndicatorValue.text = VisualizableNumber.Format(value);
         float percentage = (float)(value / maxValueOfCurrentLevel);
         transform.localScale = new Vector3(1f, percentage, 1f);
         // Hides the indicator value until it's correctly positioned in the next frame.
@@ -49,11 +49,11 @@ namespace SeedCalc {
     }
 
     void Start() {
-      // This is only for demonstrating UI design. Will be removed from production code.
+      // TODO: This is only for demonstrating the UI design. Remove it before production.
       StartCoroutine(AnimateAllLevels(1f));
     }
 
-    // This is only for demonstrating UI design. Will be removed from production code.
+    // TODO: This is only for demonstrating the UI design. Remove it before production.
     private IEnumerator AnimateAllLevels(float intervalInSeconds) {
       yield return new WaitForEndOfFrame();
       for (double value = 1.0; value < 9.0; value += 0.34788) {

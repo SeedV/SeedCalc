@@ -52,9 +52,10 @@ namespace SeedCalc.Tests {
 
     [Test]
     public void TestRangeAndFormatter() {
-      bool test = VisualizableNumbers.TryFormatVisualizableValue(_value, out string result);
-      Assert.AreEqual(_test, test);
-      Assert.AreEqual(_result, result);
+      Assert.AreEqual(_test, VisualizableNumber.IsVisualizable(_value));
+      if (_test) {
+        Assert.AreEqual(_result, VisualizableNumber.Format(_value));
+      }
     }
   }
 }

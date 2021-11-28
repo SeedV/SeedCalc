@@ -53,11 +53,11 @@ namespace SeedCalc {
     }
 
     void Start() {
-      // This is only for demonstrating UI design. Will be removed from production code.
+      // TODO: This is only for demonstrating the UI design. Remove it before production.
       StartCoroutine(AnimateAllLevels(1f));
     }
 
-    // This is only for demonstrating UI design. Will be removed from production code.
+    // TODO: This is only for demonstrating the UI design. Remove it before production.
     private IEnumerator AnimateAllLevels(float intervalInSeconds) {
       Active = true;
       for (int i = MinLevel; i <= MaxLevel; i++) {

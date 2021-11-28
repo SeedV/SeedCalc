@@ -13,10 +13,11 @@
 // limitations under the License.
 
 using System;
+using UnityEngine;
 
 namespace SeedCalc {
   // A utility class to define the range and the characteristics of the visualizable number set.
-  public static class VisualizableNumbers {
+  public static class VisualizableNumber {
     // The left end (inclusive) of the range.
     public const double _minValue = 1E-10;
     // The right end (inclusive) of the range.
@@ -25,19 +26,18 @@ namespace SeedCalc {
     // character "." if there is nay.
     public const int _maxDisplayDigits = 11;
 
-    // Tries to format a visualizable value in fixed point format.
-    public static bool TryFormatVisualizableValue(double value, out string result) {
-      if (value < _minValue || value > _maxValue) {
-        result = null;
-        return false;
-      }
+    public static bool IsVisualizable(double value) {
+      return value >= _minValue && value <= _maxValue;
+    }
 
+    // Formats a visualizable number in fixed point format.
+    public static string Format(double value) {
+      Debug.Assert(VisualizableNumber.IsVisualizable(value));
       int integerDigits = value < 1.0 ? 1 : (int)Math.Floor(Math.Log10(value) + 1);
       int fractionalDigits = _maxDisplayDigits - integerDigits;
       string format = fractionalDigits > 0 ? $"F{fractionalDigits}" : $"F0";
       string s = value.ToString(format);
-      result = fractionalDigits > 0 ? s.TrimEnd('0').TrimEnd('.') : s;
-      return true;
+      return fractionalDigits > 0 ? s.TrimEnd('0').TrimEnd('.') : s;
     }
   }
 }
