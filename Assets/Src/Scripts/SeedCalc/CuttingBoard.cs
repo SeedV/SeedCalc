@@ -16,43 +16,66 @@ using System.Collections;
 using UnityEngine;
 
 namespace SeedCalc {
+  // The cutting board to show visualizable numbers and reference objects.
   public class CuttingBoard : MonoBehaviour {
-    private const int _numLevel = 20;
-    private static readonly Color _onColor = new Color(.8f, .8f, .8f);
-    private static readonly Color _offColor = new Color(.14f, .27f, .26f);
+    public const int MinLevel = -11;
+    public const int MaxLevel = 9;
+
+    private static readonly Color _activeColor = new Color(.8f, .8f, .8f);
+    private static readonly Color _inactiveColor = new Color(.14f, .27f, .26f);
 
     public Texture RainbowTexture;
-    public GameObject _lightingMask;
+    public GameObject LightingMask;
+    public Nav Nav;
+    public Indicator Indicator;
 
-    public void TurnOn(int level) {
-      _lightingMask.SetActive(true);
-      GetComponent<Renderer>().material.mainTexture = RainbowTexture;
-      GetComponent<Renderer>().material.color = _onColor;
-      ScrollRainbowTo(level);
+    private bool _active = false;
+    private int _level = 0;
+
+    public bool Active {
+      get => _active;
+      set {
+        GetComponent<Renderer>().material.mainTexture = value ? RainbowTexture : null;
+        GetComponent<Renderer>().material.color =  value ? _activeColor : _inactiveColor;
+        LightingMask.SetActive(value);
+        Nav.Show(value);
+        Indicator.Show(value);
+        _active = value;
+      }
     }
 
-    public void TurnOff() {
-      _lightingMask.SetActive(false);
-      GetComponent<Renderer>().material.color = _offColor;
-      GetComponent<Renderer>().material.mainTexture = null;
+    public int Level {
+      get => _level;
+      set {
+        SetLevel(value);
+        _level = value;
+      }
     }
 
     void Start() {
-      StartCoroutine(AnimateAllLevels(.2f));
+      // This is only for demonstrating UI design. Will be removed from production code.
+      StartCoroutine(AnimateAllLevels(1f));
     }
 
+    // This is only for demonstrating UI design. Will be removed from production code.
     private IEnumerator AnimateAllLevels(float intervalInSeconds) {
-      TurnOn(0);
-      for (int i = 0; i < _numLevel; i++) {
-        ScrollRainbowTo(i);
+      Active = true;
+      for (int i = MinLevel; i <= MaxLevel; i++) {
+        Level = i;
         yield return new WaitForSeconds(intervalInSeconds);
       }
-      TurnOff();
+      Level = 0;
+      Active = false;
+    }
+
+    private void SetLevel(int level) {
+      ScrollRainbowTo(level);
+      Nav.SetNavLevel(level);
     }
 
     private void ScrollRainbowTo(int level) {
-      Debug.Assert(level >= 0 && level < _numLevel);
-      float texOffsetX = 0.05f * (level + 1);
+      Debug.Assert(level >= MinLevel && level <= MaxLevel);
+      float texOffsetX = (1f / (MaxLevel - MinLevel)) * (level - MinLevel + 1);
       GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(texOffsetX, 0));
     }
   }

@@ -35,6 +35,10 @@ MonoBehaviour:
     m_Key: MainScene/OverlayCanvas/IndicatorValue/Unit
     m_Metadata:
       m_Items: []
+  - m_Id: 162757788819456
+    m_Key: MainScene/OverlayCanvas/IndicatorValue/IndicatorValueUnit
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

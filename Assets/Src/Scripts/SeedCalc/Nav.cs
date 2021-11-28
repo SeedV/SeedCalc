@@ -17,28 +17,24 @@ using UnityEngine;
 using UnityEngine.UI;
 
 namespace SeedCalc {
+  // The nav bar to show the current level of the space grid.
   public class Nav : MonoBehaviour {
     public Sprite[] mSprites;
 
-    private const int _minLevel = -11;
-    private const int _maxLevel = 10;
-    private const int _defaultLevel = 0;
+    private Text _scaleMarker;
 
     public void SetNavLevel(int level) {
-      Debug.Assert(level >= _minLevel && level <= _maxLevel);
-      GetComponent<Image>().sprite = mSprites[level + -_minLevel];
+      Debug.Assert(level >= CuttingBoard.MinLevel && level <= CuttingBoard.MaxLevel);
+      GetComponent<Image>().sprite = mSprites[level + -CuttingBoard.MinLevel];
+      _scaleMarker.text = $"1E{level + 1}";
+    }
+
+    public void Show(bool visible) {
+      gameObject.SetActive(visible);
     }
 
     void Start() {
-      StartCoroutine(AnimateAllLevels(.05f));
-    }
-
-    private IEnumerator AnimateAllLevels(float intervalInSeconds) {
-      for (int i = _minLevel; i <= _maxLevel; i++) {
-        SetNavLevel(i);
-        yield return new WaitForSeconds(intervalInSeconds);
-      }
-      SetNavLevel(_defaultLevel);
+      _scaleMarker = transform.Find("Scale").Find("ScaleMarker").gameObject.GetComponent<Text>();
     }
   }
 }

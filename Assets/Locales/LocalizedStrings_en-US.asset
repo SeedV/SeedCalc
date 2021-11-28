@@ -31,11 +31,15 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 9893535801344
-    m_Localized: 5E+10 m
+    m_Localized: m
     m_Metadata:
       m_Items: []
   - m_Id: 52941309337600
     m_Localized: <size=40>m</size>
+    m_Metadata:
+      m_Items: []
+  - m_Id: 162757788819456
+    m_Localized: m
     m_Metadata:
       m_Items: []
   references:
