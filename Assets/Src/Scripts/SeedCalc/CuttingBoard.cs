@@ -21,8 +21,12 @@ namespace SeedCalc {
     public const int MinLevel = -11;
     public const int MaxLevel = 9;
 
+    // The Albedo color of the CuttingBoard material, when the rainbow texture is active.
     private static readonly Color _activeColor = new Color(.8f, .8f, .8f);
+    // The Albedo color of the CuttingBoard material, when the rainbow texture is inactive.
     private static readonly Color _inactiveColor = new Color(.14f, .27f, .26f);
+    // The initial x offset of the rainbow texture. See the config of the CuttingBoard material.
+    private const float _rainbowTexInitOffsetX = 0.05f;
 
     public Texture RainbowTexture;
     public GameObject LightingMask;
@@ -75,7 +79,11 @@ namespace SeedCalc {
 
     private void ScrollRainbowTo(int level) {
       Debug.Assert(level >= MinLevel && level <= MaxLevel);
-      float texOffsetX = (1f / (MaxLevel - MinLevel)) * (level - MinLevel + 1);
+      int intervals = MaxLevel - MinLevel;
+      float texOffsetX = 1.0f / intervals * (level - MinLevel) + _rainbowTexInitOffsetX;
+      if (texOffsetX > 1.0f) {
+        texOffsetX -= 1.0f;
+      }
       GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(texOffsetX, 0));
     }
   }

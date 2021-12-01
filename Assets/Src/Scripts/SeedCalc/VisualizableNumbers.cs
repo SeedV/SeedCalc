@@ -19,12 +19,12 @@ namespace SeedCalc {
   // A utility class to define the range and the characteristics of the visualizable number set.
   public static class VisualizableNumber {
     // The left end (inclusive) of the range.
-    public const double _minValue = 1E-10;
+    private const double _minValue = 1E-10;
     // The right end (inclusive) of the range.
-    public const double _maxValue = 1E+10;
+    private const double _maxValue = 1E+10;
     // The maximum number of all display digits [0-9] in the formated string, excluding the point
     // character "." if there is nay.
-    public const int _maxDisplayDigits = 11;
+    private const int _maxDisplayDigits = 11;
 
     public static bool IsVisualizable(double value) {
       return value >= _minValue && value <= _maxValue;

@@ -19,13 +19,13 @@ using UnityEngine.UI;
 namespace SeedCalc {
   // The nav bar to show the current level of the space grid.
   public class Nav : MonoBehaviour {
-    public Sprite[] mSprites;
+    public Sprite[] Sprites;
 
     private Text _scaleMarker;
 
     public void SetNavLevel(int level) {
       Debug.Assert(level >= CuttingBoard.MinLevel && level <= CuttingBoard.MaxLevel);
-      GetComponent<Image>().sprite = mSprites[level + -CuttingBoard.MinLevel];
+      GetComponent<Image>().sprite = Sprites[level - CuttingBoard.MinLevel];
       _scaleMarker.text = $"1E{level + 1}";
     }
 
