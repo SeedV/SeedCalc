@@ -39,6 +39,30 @@ MonoBehaviour:
     m_Key: MainScene/OverlayCanvas/IndicatorValue/IndicatorValueUnit
     m_Metadata:
       m_Items: []
+  - m_Id: 1089811799597056
+    m_Key: MainScene/OverlayCanvas/Nav/Scale/ScaleMarker/ScaleMarkerUnit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1780705435574272
+    m_Key: MainScene/OverlayCanvas/Nav/Scale/ScaleMarker/ScaleMarkerUnit 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1780776021516288
+    m_Key: MainScene/OverlayCanvas/Nav/1E+10 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1780837812002816
+    m_Key: MainScene/OverlayCanvas/Nav/1E-10 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1780887791329280
+    m_Key: MainScene/OverlayCanvas/Nav/1E0 1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1781029252620288
+    m_Key: MainScene/OverlayCanvas/IndicatorValue/IndicatorValueUnit 1
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:
