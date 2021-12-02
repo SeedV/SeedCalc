@@ -13,8 +13,8 @@
 // limitations under the License.
 
 using System.Collections;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SeedCalc {
   // The indicator bar and its display value to show the current visualizable number.
@@ -24,9 +24,9 @@ namespace SeedCalc {
     private const float _indicatorValueOriginY = -210f;
     private const float _indicatorUnitSize = 45f;
 
-    public Text IndicatorValue;
+    public TextMeshProUGUI IndicatorValue;
 
-    public void UpdateValue(double maxValueOfCurrentLevel, double value) {
+    public void SetValue(double maxValueOfCurrentLevel, double value) {
       Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
       if (VisualizableNumber.IsVisualizable(value)) {
         IndicatorValue.text = VisualizableNumber.Format(value);
@@ -36,9 +36,9 @@ namespace SeedCalc {
         var indicatorValueRect = IndicatorValue.GetComponent<RectTransform>();
         float indicatorValueX = indicatorValueRect.anchoredPosition.x;
         indicatorValueRect.anchoredPosition = new Vector2(indicatorValueX, -_canvasHeight);
-        // The indicator value UI.Text uses ContentFilterSize to auto-adjust its size. When the text
-        // content is set, the rect size will not be updated until the next frame. Thus we have to
-        // wait for the next frame to calculate and set the position of the indicator value.
+        // The indicator value's UI element uses ContentFilterSize to auto-adjust its size. When the
+        // text content is set, the rect size will not be updated until the next frame. Thus we have
+        // to wait for the next frame to calculate and set the position of the indicator value.
         StartCoroutine(PositionIndicatorValueInNextFrame(percentage, indicatorValueRect));
       }
     }
@@ -49,18 +49,6 @@ namespace SeedCalc {
     }
 
     void Start() {
-      // TODO: This is only for demonstrating the UI design. Remove it before production.
-      StartCoroutine(AnimateAllLevels(1f));
-    }
-
-    // TODO: This is only for demonstrating the UI design. Remove it before production.
-    private IEnumerator AnimateAllLevels(float intervalInSeconds) {
-      yield return new WaitForEndOfFrame();
-      for (double value = 1.0; value < 9.0; value += 0.34788) {
-        UpdateValue(10.0, value);
-        yield return new WaitForSeconds(intervalInSeconds);
-      }
-      UpdateValue(10.0, 9.0506070809);
     }
 
     private IEnumerator PositionIndicatorValueInNextFrame(
