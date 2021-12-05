@@ -23,7 +23,7 @@ namespace SeedCalc {
       // Every reference object must have an empty parent object as its container. The container
       // object is used to position and scale the reference object.
       public string ContainerName;
-      // The reference object itsself owns the animations that can be triggered by controllers. It
+      // The reference object itself owns the animations that can be triggered by controllers. It
       // must also have a collider component so that it can receive users' click and touch events.
       public string ObjName;
       // The initial position of the object.
@@ -61,7 +61,7 @@ namespace SeedCalc {
     public double ScalePerLargeUnit;
 
     // The formmatted value string of the scale marker length. Theoretically this value can be got
-    // from (ScalePerLargeUnit / 5.0), but we require a pre-formatted string here to provide a
+    // from (ScalePerLargeUnit / 5.0), but we require a pre-formatted string here to provide
     // flexibility to render the marker in very different formats for different levels.
     public string ScaleMarkerValueString;
 

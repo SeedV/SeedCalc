@@ -20,7 +20,7 @@ namespace SeedCalc {
   // The nav bar to show the current level of the space grid.
   public class Nav : MonoBehaviour {
     // The nav bar uses a different level system compared with the main cutting board, so that there
-    // is a flexibility to map more than one cutting board levels to the same nav bar level. The
+    // is flexibility to map more than one cutting board levels to the same nav bar level. The
     // rainbow texture also follows the nav bar level, each nav bar level corresponding to a unique
     // rainbow color section.
     public const int MinLevel = -11;

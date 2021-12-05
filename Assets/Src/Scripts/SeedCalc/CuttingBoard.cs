@@ -20,11 +20,11 @@ namespace SeedCalc {
   // The cutting board to show visualizable numbers and reference objects.
   public class CuttingBoard : MonoBehaviour {
     private class SlideAnimConfig {
-      internal GameObject Actor;
-      internal Vector3 FromPosition;
-      internal Vector3 ToPosition;
-      internal Vector3 FromScale;
-      internal Vector3 ToScale;
+      public GameObject Actor;
+      public Vector3 FromPosition;
+      public Vector3 ToPosition;
+      public Vector3 FromScale;
+      public Vector3 ToScale;
     }
 
     // The active and inactive colors for the CuttingBoard material.
@@ -95,7 +95,7 @@ namespace SeedCalc {
     void Update() {
       if (Input.GetMouseButtonDown(0)) {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 100.0f)){
+        if (Physics.Raycast(ray, out RaycastHit hit, 100.0f)) {
           if (_refObjs.TryGetValue(hit.transform.name,
                                    out (GameObject Container, GameObject Obj) hitted)) {
             hitted.Obj.GetComponent<Animator>()?.SetTrigger(_activeAnimTriggerName);
