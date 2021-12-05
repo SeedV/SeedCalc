@@ -22,16 +22,15 @@ namespace SeedCalc.Tests {
         yield return new TestFixtureData(-0.1, false, null);
         yield return new TestFixtureData(0, false, null);
         yield return new TestFixtureData(9.999e-11, false, null);
-        yield return new TestFixtureData(1.001e+10, false, null);
-
+        yield return new TestFixtureData(1e+11, false, null);
         yield return new TestFixtureData(1e-10, true, "0.0000000001");
-        yield return new TestFixtureData(1.1e-10, true, "0.0000000001");
+        yield return new TestFixtureData(1.1e-10, true, "0.00000000011");
         yield return new TestFixtureData(1, true, "1");
         yield return new TestFixtureData(3.14, true, "3.14");
         yield return new TestFixtureData(31.4, true, "31.4");
         yield return new TestFixtureData(100, true, "100");
         yield return new TestFixtureData(99999, true, "99999");
-        yield return new TestFixtureData(3.14159265359e+9, true, "3141592653.6");
+        yield return new TestFixtureData(3.14159265358979e+9, true, "3141592653.59");
         yield return new TestFixtureData(9.999e+9, true, "9999000000");
         yield return new TestFixtureData(1e+10, true, "10000000000");
       }

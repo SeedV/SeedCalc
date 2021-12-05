@@ -14,14 +14,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_TableCollectionName: LocalizedAssets
   m_TableCollectionNameGuidString: 5a6ec2ee3c6bd41e48b758db0b821f9c
-  m_Entries: []
+  m_Entries:
+  - m_Id: 1780862352875520
+    m_Key: MainScene/OverlayCanvas/IndicatorValue/IndicatorValueUnit
+    m_Metadata:
+      m_Items: []
+  - m_Id: 1780873912377344
+    m_Key: MainScene/OverlayCanvas/IndicatorValue/IndicatorValueUnit 1
+    m_Metadata:
+      m_Items: []
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 0
+    - id: 1
   m_KeyGenerator:
-    id: 0
+    id: 2
   references:
     version: 1
     00000000:
+      type: {class: AssetTypeMetadata, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries:
+        - m_KeyId: 1780862352875520
+          m_TableCodes:
+          - en-US
+          - zh-CN
+        m_TypeString: TMPro.TMP_FontAsset, Unity.TextMeshPro, Version=0.0.0.0, Culture=neutral,
+          PublicKeyToken=null
+    00000001:
+      type: {class: AssetTypeMetadata, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
+      data:
+        m_Entries:
+        - m_KeyId: 1780873912377344
+          m_TableCodes:
+          - en-US
+          - zh-CN
+        m_TypeString: UnityEngine.Material, UnityEngine.CoreModule, Version=0.0.0.0,
+          Culture=neutral, PublicKeyToken=null
+    00000002:
       type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
       data:
         m_CustomEpoch: 1638023878873

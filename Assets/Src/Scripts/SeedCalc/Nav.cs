@@ -12,21 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SeedCalc {
   // The nav bar to show the current level of the space grid.
   public class Nav : MonoBehaviour {
+    // The nav bar uses a different level system compared with the main cutting board, so that there
+    // is flexibility to map more than one cutting board levels to the same nav bar level. The
+    // rainbow texture also follows the nav bar level, each nav bar level corresponding to a unique
+    // rainbow color section.
+    public const int MinLevel = -11;
+    public const int MaxLevel = 9;
+    public const int DefaultLevel = 0;
+    public const string DefaultMarkerValueString = "0.5";
+
     public Sprite[] Sprites;
 
-    private Text _scaleMarker;
+    private TextMeshProUGUI _scaleMarker;
 
-    public void SetNavLevel(int level) {
-      Debug.Assert(level >= CuttingBoard.MinLevel && level <= CuttingBoard.MaxLevel);
-      GetComponent<Image>().sprite = Sprites[level - CuttingBoard.MinLevel];
-      _scaleMarker.text = $"1E{level + 1}";
+    public void SetNavLevel(int navLevel, string scaleMarkerValueString) {
+      Debug.Assert(navLevel >= MinLevel && navLevel <= MaxLevel);
+      GetComponent<Image>().sprite = Sprites[navLevel - MinLevel];
+      _scaleMarker.text = scaleMarkerValueString;
     }
 
     public void Show(bool visible) {
@@ -34,7 +43,9 @@ namespace SeedCalc {
     }
 
     void Start() {
-      _scaleMarker = transform.Find("Scale").Find("ScaleMarker").gameObject.GetComponent<Text>();
+      var t = transform.Find("Scale").Find("ScaleMarker");
+      Debug.Assert(!(t is null));
+      _scaleMarker = t.gameObject.GetComponent<TextMeshProUGUI>();
     }
   }
 }
