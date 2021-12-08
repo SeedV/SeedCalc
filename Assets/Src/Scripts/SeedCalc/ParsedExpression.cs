@@ -19,8 +19,6 @@ using UnityEngine;
 namespace SeedCalc {
   // The parsed expression for the calculator screen to display.
   public class ParsedExpression {
-    private const string _negative = "-";
-
     // The input expression in plain text format. Incomplete expressions are accepted since the
     // calculator screen can syntax highlight the tokens before user finishes the expression.
     public string Expression { get; }
