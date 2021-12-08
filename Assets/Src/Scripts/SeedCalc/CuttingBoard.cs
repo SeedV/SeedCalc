@@ -15,16 +15,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
+using AgileMvvm;
+using SeedLang.Common;
 
 namespace SeedCalc {
   // The cutting board to show visualizable numbers and reference objects.
   public class CuttingBoard : MonoBehaviour {
     private class SlideAnimConfig {
-      public GameObject Actor;
-      public Vector3 FromPosition;
-      public Vector3 ToPosition;
-      public Vector3 FromScale;
-      public Vector3 ToScale;
+      internal GameObject Actor;
+      internal Vector3 FromPosition;
+      internal Vector3 ToPosition;
+      internal Vector3 FromScale;
+      internal Vector3 ToScale;
     }
 
     // The active and inactive colors for the CuttingBoard material.
@@ -38,7 +42,9 @@ namespace SeedCalc {
     // The trigger name to play the active animation when user clicks or touches on the object.
     private const string _activeAnimTriggerName = "Active";
     // The nubmer of animation steps (frames) when transitioning to the neighbor level.
-    private const int _transitionAnimSteps = 30;
+    private const int _transitionAnimSteps = 20;
+    // A number that is not visualizable so that it can be queued to turn off the indicator.
+    private const int _nonVisualizableNumber = -1;
 
     public GameObject RootOfRefObjs;
     public GameObject RootOfDescPanels;
@@ -46,6 +52,10 @@ namespace SeedCalc {
     public GameObject LightingMask;
     public Nav Nav;
     public Indicator Indicator;
+
+    public AudioClip JumpToSound;
+    public AudioClip SlideToSound;
+    public AudioClip PlayAnimSound;
 
     private bool _active = false;
     private int _currentLevel = -1;
@@ -57,24 +67,6 @@ namespace SeedCalc {
     private Dictionary<string, (GameObject Container, GameObject Obj)> _refObjs =
         new Dictionary<string, (GameObject Container, GameObject Obj)>();
 
-    // Turns the cutting board on/off.
-    public bool Active {
-      get => _active;
-      set {
-        GetComponent<Renderer>().material.mainTexture = value ? RainbowTexture : null;
-        GetComponent<Renderer>().material.color =  value ? _activeColor : _inactiveColor;
-        LightingMask.SetActive(value);
-        Nav.Show(value);
-        Indicator.Show(value);
-        ShowCurrentRefObjs(value);
-        if (value && _currentLevel < 0) {
-          Indicator.Show(false);
-          Nav.SetNavLevel(Nav.DefaultLevel, Nav.DefaultMarkerValueString);
-        }
-        _active = value;
-      }
-    }
-
     // Queues a new number to be visualized. A transition between two visualization levels might not
     // be completed within one frame, thus a queue is used to hold the numbers to be visualized. A
     // coroutine LevelTransitionLoop keeps running to peek numbers from the queue and play the
@@ -85,35 +77,62 @@ namespace SeedCalc {
       _numberQueue.Enqueue(number);
     }
 
+    public void OnCalculatorParsedExpressionUpdated(object sender, UpdatedEvent.Args args) {
+      if (args.Value is null) {
+        return;
+      }
+      var parsedExpression = args.Value as ParsedExpression;
+      if (!parsedExpression.BeingCalculated &&
+          parsedExpression.SyntaxTokens.Count == 1 &&
+          parsedExpression.SyntaxTokens[0].Type == SyntaxType.Number &&
+          parsedExpression.TryParseNumber(0, out double number)) {
+        QueueNewNumber(number);
+      } else {
+        // In public interfaces, do NOT update the internal states (e.g., Indicator.Visible = false)
+        // directly, since the queued numbers access the internal states in an asynchronous way.
+        // It's recommended to queue a non-visualizable number to turn off the indicator.
+        QueueNewNumber(_nonVisualizableNumber);
+      }
+    }
+
+    public void OnCalculatorResultUpdated(object sender, UpdatedEvent.Args args) {
+      double? result = args.Value as double?;
+      QueueNewNumber(result is null ? _nonVisualizableNumber : (double)result);
+    }
+
     void Start() {
-      Active = false;
+      SetActive(false);
       SetupRefObjs();
       SetupDescPanels();
       StartCoroutine(LevelTransitionLoop());
     }
 
     void Update() {
-      if (Input.GetMouseButtonDown(0)) {
+      if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
         var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, 100.0f)) {
           if (_refObjs.TryGetValue(hit.transform.name,
                                    out (GameObject Container, GameObject Obj) hitted)) {
             hitted.Obj.GetComponent<Animator>()?.SetTrigger(_activeAnimTriggerName);
-          } else {
-            // TODO: This on-click logic is for testing only. Remove it before production.
-            int targetLevel = (_currentLevel + 1) % LevelConfigs.Levels.Count;
-            QueueNewNumber(LevelConfigs.Levels[targetLevel].MinVisualizableNumber);
+            PlaySound(PlayAnimSound);
           }
         }
       }
-      // TODO: This on-right-click logic is for testing only. Remove it before production.
-      if (Input.GetMouseButtonDown(1)) {
-        int targetLevel = _currentLevel - 1;
-        if (targetLevel < 0) {
-          targetLevel = LevelConfigs.Levels.Count - 1;
-        }
-        QueueNewNumber(LevelConfigs.Levels[targetLevel].MinVisualizableNumber);
+    }
+
+    // Turns the cutting board on/off.
+    private void SetActive(bool active) {
+      GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : null;
+      GetComponent<Renderer>().material.color =  active ? _activeColor : _inactiveColor;
+      LightingMask.SetActive(active);
+      Nav.Show(active);
+      Indicator.Visible = active;
+      ShowCurrentRefObjs(active);
+      if (active && _currentLevel < 0) {
+        Indicator.Visible = false;
+        Nav.SetNavLevel(Nav.DefaultLevel, Nav.DefaultMarkerValueString);
       }
+      _active = active;
     }
 
     // The transition loop coroutine keeps running, peeking queued numbers and playing transition
@@ -129,11 +148,11 @@ namespace SeedCalc {
           double number = _numberQueue.Dequeue();
           int level = LevelConfigs.MapNumberToLevel(number);
           if (level >= 0) {
-            if (!Active) {
-              Active = true;
+            if (!_active) {
+              SetActive(true);
             }
             // Hides indicator and desc panels during the transition.
-            Indicator.Show(false);
+            Indicator.Visible = false;
             ShowCurrentDescPanels(false);
             if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
               // Slides to the left/right neighbor level.
@@ -153,17 +172,19 @@ namespace SeedCalc {
               if (!(objectToHideAfterAnim is null)) {
                 objectToHideAfterAnim.SetActive(false);
               }
+              PlaySound(JumpToSound);
             } else if (_currentLevel != level) {
               // Jumps to the target level directly. For now there is no transition animation when
               // jumping to a non-neighbor level.
               JumpToLevel(level);
+              PlaySound(PlayAnimSound);
             }
             // Shows everything up once the transition is done.
             _currentLevel = level;
             Nav.SetNavLevel(LevelConfigs.Levels[level].NavLevel,
                             LevelConfigs.Levels[level].ScaleMarkerValueString);
             ScrollRainbowTo(LevelConfigs.Levels[level].NavLevel);
-            Indicator.Show(true);
+            Indicator.Visible = true;
             double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
             Indicator.SetValue(indicatorMax, number);
             ShowCurrentDescPanels(true);
@@ -171,8 +192,7 @@ namespace SeedCalc {
             // When a number is not able to be visualized, we do not turn the whole board to its
             // inactive mode. Instead, we simply hide the number indicator while keeping the
             // reference objects live on the board.
-            _currentLevel = -1;
-            Indicator.Show(false);
+            Indicator.Visible = false;
           }
         }
         yield return null;
@@ -347,7 +367,12 @@ namespace SeedCalc {
       if (texOffsetX > 1.0f) {
         texOffsetX -= 1.0f;
       }
-      GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new Vector2(texOffsetX, 0));
+      GetComponent<Renderer>().material.SetTextureOffset("_MainTex",
+                                                         new UnityEngine.Vector2(texOffsetX, 0));
+    }
+
+    private void PlaySound(AudioClip audioClip, float volumeScale = 1f) {
+      GetComponent<AudioSource>().PlayOneShot(audioClip, volumeScale);
     }
   }
 }

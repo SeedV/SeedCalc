@@ -14,8 +14,9 @@
 
 using System.Collections.Generic;
 using System.Text;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+
 using AgileMvvm;
 using SeedLang.Common;
 
@@ -23,20 +24,14 @@ namespace SeedCalc {
   // The UI component of the calculator screen.
   public class CalculatorScreen : MonoBehaviour {
     private const string _errPrefix = "ERR:";
-    private const string _colorHighlighted = "#f30";
-    private const string _colorNumber = "#03f";
-    private const string _colorOperator = "#090";
-    private const string _colorParenthesis = "#555";
-    private const string _colorInvalid = "#ccc";
+    private const string _colorHighlighted = "#f10";
+    private const string _colorNumber = "#000";
+    private const string _colorMulDiv = "#e539e5";
+    private const string _colorAddSub = "#00b4f0";
+    private const string _colorParenthesis = "#655aff";
+    private const string _colorInvalid = "#666";
     private const string _colorBeingCalculated = "#f90";
-    private const string _initialText = "0";
-
-    // The font size changes among three choices, depending on the length of the message.
-    private static readonly (int minChar, int fontSize)[] _fontSizes = new (int, int)[] {
-      (0, 280),
-      (13, 140),
-      (50, 90),
-    };
+    private static readonly string _initialText = $"<color={_colorNumber}>0</color>";
 
     private static readonly Dictionary<string, string> _displayOperators =
         new Dictionary<string, string> {
@@ -44,34 +39,28 @@ namespace SeedCalc {
       { "/", "\u00F7" },
     };
 
-    private Text _text;
+    private TextMeshProUGUI _topLine;
+    private TextMeshProUGUI _bottomLine;
 
     // Clears the screen.
     public void Clear() {
-      Print(null, 0);
+      PrintToTop(null);
+      PrintToBottom(null);
     }
 
     // Prints an error message.
     public void PrintError(string errorMessage) {
-      _text.text = $"{_errPrefix}<color={_colorHighlighted}>{errorMessage.ToUpper()}</color>";
-      _text.fontSize = _fontSizes[0].fontSize;
+      PrintToBottom($"{_errPrefix}<color={_colorHighlighted}>{errorMessage.ToUpper()}</color>");
     }
 
-    // Prints a message. The parameter plainTextLength specifies the plain text length of the
-    // message, excluding style tags such as "<color=...>".
-    public void Print(string message, int plainTextLength) {
-      if (string.IsNullOrEmpty(message)) {
-        _text.text = $"<color={_colorNumber}>{_initialText}</color>";
-        _text.fontSize = _fontSizes[0].fontSize;
-      } else {
-        _text.text = message;
-        for (int i = _fontSizes.Length - 1; i >= 0; i--) {
-          if (plainTextLength > _fontSizes[i].minChar) {
-            _text.fontSize = _fontSizes[i].fontSize;
-            break;
-          }
-        }
-      }
+    // Prints a message to the top line.
+    public void PrintToTop(string text) {
+      PrintTo(_topLine, text is null ? "" : text);
+    }
+
+    // Prints a message to the bottom line.
+    public void PrintToBottom(string text) {
+      PrintTo(_bottomLine, text is null ? "" : text);
     }
 
     public void OnCalculatorStateUpdated(object sender, UpdatedEvent.Args args) {
@@ -82,28 +71,39 @@ namespace SeedCalc {
       }
     }
 
-    public void OnCalculatorDisplayTokensUpdated(object sender, UpdatedEvent.Args args) {
+    public void OnCalculatorParsedExpressionUpdated(object sender, UpdatedEvent.Args args) {
       if (args.Value is null) {
-        Print(null, 0);
+        PrintToTop(_initialText);
         return;
       }
-      var displayContent = args.Value as DisplayContent;
+      var parsedExpression = args.Value as ParsedExpression;
+      if (parsedExpression.SyntaxTokens.Count <= 0) {
+        PrintToTop(_initialText);
+        return;
+      }
       var textBuffer = new StringBuilder();
-      int plainTextLength = 0;
-      foreach (var token in displayContent.SyntaxTokens) {
-        string tokenText = GetTokenText(displayContent.Expression, token.Range);
+      foreach (var token in parsedExpression.SyntaxTokens) {
+        string tokenText = parsedExpression.ExtractTokenText(token);
         string color;
-        if (displayContent.BeingCalculatedRange != null &&
-            displayContent.BeingCalculatedRange.Start <= token.Range.Start &&
-            displayContent.BeingCalculatedRange.End >= token.Range.End) {
+        if (parsedExpression.HighlightedRange != null &&
+            parsedExpression.HighlightedRange.Start <= token.Range.Start &&
+            parsedExpression.HighlightedRange.End >= token.Range.End) {
           color = _colorBeingCalculated;
+          if (token.Type == SyntaxType.Operator &&
+              _displayOperators.TryGetValue(tokenText, out string displayToken)) {
+            tokenText = displayToken;
+          }
         } else {
           switch (token.Type) {
             case SyntaxType.Operator:
+              if (tokenText == "*" || tokenText == "/") {
+                color = _colorMulDiv;
+              } else {
+                color = _colorAddSub;
+              }
               if (_displayOperators.TryGetValue(tokenText, out string displayToken)) {
                 tokenText = displayToken;
               }
-              color = _colorOperator;
               break;
             case SyntaxType.Parenthesis:
               color = _colorParenthesis;
@@ -118,18 +118,35 @@ namespace SeedCalc {
           }
         }
         textBuffer.Append($"<color={color}>{tokenText}</color>");
-        plainTextLength += tokenText.Length;
       }
-      Print(textBuffer.ToString(), plainTextLength);
+      PrintToTop(textBuffer.ToString());
+      if (!parsedExpression.BeingCalculated &&
+          parsedExpression.TryParseLastTokenToNumber(out double lastNumber)) {
+        PrintToBottom(NumberFormatter.Format((double)lastNumber));
+      }
     }
 
-    void Awake() {
-      _text = GetComponent<Text>();
+    public void OnCalculatorResultUpdated(object sender, UpdatedEvent.Args args) {
+      double? result = args.Value as double?;
+      if (result is null) {
+        PrintToBottom(null);
+      } else {
+        PrintToBottom(NumberFormatter.Format((double)result));
+      }
+    }
+
+    void Start() {
+      _topLine = transform.Find("TopLine").GetComponent<TextMeshProUGUI>();
+      _bottomLine = transform.Find("BottomLine").GetComponent<TextMeshProUGUI>();
       Clear();
     }
 
-    private string GetTokenText(string expression, TextRange range) {
-      return expression.Substring(range.Start.Column, range.End.Column - range.Start.Column + 1);
+    private void PrintTo(TextMeshProUGUI where, string text) {
+      if (string.IsNullOrEmpty(text)) {
+        where.text = _initialText;
+      } else if (!string.IsNullOrEmpty(text)) {
+        where.text = text;
+      }
     }
   }
 }

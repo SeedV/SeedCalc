@@ -13,54 +13,42 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using AgileMvvm;
 
 namespace SeedCalc {
   public class GameManager : MonoBehaviour {
-    private const string _audioSourcePrefix = "Audio";
-    private const string _buttonClickAudioName = "Click";
-    private readonly Dictionary<string, AudioSource> _audioTable =
-        new Dictionary<string, AudioSource>();
     private Calculator _calculator = null;
 
     // The UI component of the calculator screen must be associated to this field in Unity.
     public CalculatorScreen Screen;
+    public CuttingBoard CuttingBoard;
 
     public void OnClickButton(string input) {
-      PlayAudio(_buttonClickAudioName);
-      _calculator.OnInput(input);
-    }
-
-    public void PlayAudio(string name) {
-      if (_audioTable.TryGetValue(name, out var audioSource) && !audioSource.isPlaying) {
-        audioSource.Play();
+      if (_calculator.AcceptingInput) {
+        GetComponent<AudioSource>().Play();
+        _calculator.OnInput(input);
       }
     }
 
     void Awake() {
-      LocateAudioSources();
       // Binds the ViewModel class to all the View classes.
-      _calculator = new Calculator();
+      _calculator = new Calculator(CalculationMode.DemoCalculationSteps, this);
       _calculator.Bind(
           nameof(_calculator.State),
           new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorStateUpdated));
       _calculator.Bind(
-          nameof(_calculator.DisplayContent),
-          new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorDisplayTokensUpdated));
-    }
-
-    // Collects all the audio sources that are associated with the GameManager instance.
-    private void LocateAudioSources() {
-      foreach (Transform child in transform) {
-        var childObject = child.gameObject;
-        if (childObject.name.StartsWith(_audioSourcePrefix)) {
-          string audioName = childObject.name.Substring(_audioSourcePrefix.Length);
-          var audioSource = childObject.GetComponent<AudioSource>();
-          _audioTable.Add(audioName, audioSource);
-        }
-      }
+          nameof(_calculator.ParsedExpression),
+          new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorParsedExpressionUpdated));
+      _calculator.Bind(
+          nameof(_calculator.Result),
+          new EventHandler<UpdatedEvent.Args>(Screen.OnCalculatorResultUpdated));
+      _calculator.Bind(
+          nameof(_calculator.ParsedExpression),
+          new EventHandler<UpdatedEvent.Args>(CuttingBoard.OnCalculatorParsedExpressionUpdated));
+      _calculator.Bind(
+          nameof(_calculator.Result),
+          new EventHandler<UpdatedEvent.Args>(CuttingBoard.OnCalculatorResultUpdated));
     }
   }
 }

@@ -23,7 +23,7 @@ namespace SeedCalc {
       // Every reference object must have an empty parent object as its container. The container
       // object is used to position and scale the reference object.
       public string ContainerName;
-      // The reference object itself owns the animations that can be triggered by controllers. It
+      // The reference object itsself owns the animations that can be triggered by controllers. It
       // must also have a collider component so that it can receive users' click and touch events.
       public string ObjName;
       // The initial position of the object.
@@ -77,6 +77,11 @@ namespace SeedCalc {
 
   // The global definitions of all the visualization levels.
   public static class LevelConfigs {
+    // Determines if a double value is visualizable based on the level configs.
+    public static bool IsVisualizable(double value) {
+      return LevelConfigs.MapNumberToLevel(value) >= 0;
+    }
+
     // Maps a visualizable number to a predefined level.
     public static int MapNumberToLevel(double number) {
       if (number <= 0) {
@@ -84,8 +89,15 @@ namespace SeedCalc {
       }
       for (int level = 0; level < Levels.Count; level++) {
         var config = Levels[level];
-        if ((number >= config.MinVisualizableNumber && number < config.MaxVisualizableNumber) ||
-            (level == Levels.Count - 1 && number == config.MaxVisualizableNumber)) {
+        // Uses a [Min, Max) range to determinate if the number falls in a particular level, except
+        // for the first level where [Min, Max] is used.
+        //
+        // If a (Min, Max] range is needed, the following conditions can be used instead:
+        //
+        //     (number >= config.MinVisualizableNumber && number < config.MaxVisualizableNumber) ||
+        //     (level == Levels.Count - 1 && number == config.MaxVisualizableNumber)
+        if ((number > config.MinVisualizableNumber && number <= config.MaxVisualizableNumber) ||
+            (level == 0 && number == config.MinVisualizableNumber)) {
           return level;
         }
       }
@@ -133,23 +145,23 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "FluorineAtom_Container",
             ObjName = "FluorineAtom",
-            InitialPosition = new Vector3(-2.65f, -2.65f, -.5f),
+            InitialPosition = new Vector3(-2.65f, -2.65f, -10f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
+                new Vector3(LevelConfig.VanishingLeftX, -2.65f, -.5f),
           },
           new LevelConfig.RefObjConfig {
             ContainerName = "DNA_Container",
             ObjName = "DNA",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+                new Vector3(80, LevelConfig.VanishingRightY, 20f),
           },
         },
         ScalePerLargeUnit = 6e-10,
         NavLevel = -10,
         ScaleMarkerValueString = "1.2E-10",
         MinVisualizableNumber = 3e-10,
-        MaxVisualizableNumber = 2.4e-9,
+        MaxVisualizableNumber = 1e-9, // Max scale of this level is 2.4e-9,
       },
 
       // 1E-9 and 1E-8.
@@ -158,9 +170,9 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "DNA_Container",
             ObjName = "DNA",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -.5f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
+                new Vector3(LevelConfig.VanishingLeftX, -2.7f, -.5f),
           },
           new LevelConfig.RefObjConfig {
             ContainerName = "Catalase_Container",
@@ -173,7 +185,7 @@ namespace SeedCalc {
         ScalePerLargeUnit = 2.5e-9,
         NavLevel = -9,
         ScaleMarkerValueString = "5E-10",
-        MinVisualizableNumber = 2.4e-9,
+        MinVisualizableNumber = 1e-9,
         MaxVisualizableNumber = 1e-8,
       },
 
@@ -224,7 +236,7 @@ namespace SeedCalc {
         NavLevel = -7,
         ScaleMarkerValueString = "1E-7",
         MinVisualizableNumber = 1e-7,
-        MaxVisualizableNumber = 2e-6,
+        MaxVisualizableNumber = 1e-6, // Max scale of this level is 2e-6,
       },
 
       // 1E-6 and 1E-5.
@@ -245,11 +257,11 @@ namespace SeedCalc {
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
         },
-        ScalePerLargeUnit = 2.5e-6,
+        ScalePerLargeUnit = 5e-6,
         NavLevel = -6,
-        ScaleMarkerValueString = "5E-7",
-        MinVisualizableNumber = 2e-6,
-        MaxVisualizableNumber = 1e-5,
+        ScaleMarkerValueString = "1E-6",
+        MinVisualizableNumber = 1e-6,
+        MaxVisualizableNumber = 1e-5, // Max scale of this level is 2e-5,
       },
 
       // 1E-5 and 1E-4.
@@ -270,11 +282,11 @@ namespace SeedCalc {
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
         },
-        ScalePerLargeUnit = 2.5e-5,
+        ScalePerLargeUnit = 5e-5,
         NavLevel = -5,
-        ScaleMarkerValueString = "5E-6",
+        ScaleMarkerValueString = "1E-5",
         MinVisualizableNumber = 1e-5,
-        MaxVisualizableNumber = 1e-4,
+        MaxVisualizableNumber = 1e-4, // Max scale of this level is 2e-4,
       },
 
       // 1E-4 and 1E-3.
@@ -297,9 +309,9 @@ namespace SeedCalc {
         },
         ScalePerLargeUnit = 5e-4,
         NavLevel = -4,
-        ScaleMarkerValueString = "1E-5",
+        ScaleMarkerValueString = "1E-4",
         MinVisualizableNumber = 1e-4,
-        MaxVisualizableNumber = 2e-3,
+        MaxVisualizableNumber = 1e-3, // Max scale of this level is 2e-3,
       },
 
       // 1E-3 and 1E-2.
@@ -315,7 +327,7 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "Bee_Container",
             ObjName = "Bee",
-            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            InitialPosition = new Vector3(.5f, LevelConfig.RightCenterY, -5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
@@ -323,7 +335,7 @@ namespace SeedCalc {
         ScalePerLargeUnit = .0025,
         NavLevel = -3,
         ScaleMarkerValueString = "0.0005",
-        MinVisualizableNumber = 2e-3,
+        MinVisualizableNumber = 1e-3,
         MaxVisualizableNumber = .01,
       },
 
@@ -345,11 +357,11 @@ namespace SeedCalc {
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
         },
-        ScalePerLargeUnit = .025,
+        ScalePerLargeUnit = .05,
         NavLevel = -2,
-        ScaleMarkerValueString = "0.005",
+        ScaleMarkerValueString = "0.01",
         MinVisualizableNumber = .01,
-        MaxVisualizableNumber = .1,
+        MaxVisualizableNumber = .1, // Max scale of this level is .2,
       },
 
       // 1E-1 and 1E0.
@@ -365,7 +377,7 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "Penguin_Container",
             ObjName = "Penguin",
-            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
@@ -449,7 +461,7 @@ namespace SeedCalc {
         NavLevel = 2,
         ScaleMarkerValueString = "100",
         MinVisualizableNumber = 100,
-        MaxVisualizableNumber = 2000,
+        MaxVisualizableNumber = 1000 // Max scale of this level is 2000,
       },
 
       // 1E+3 and 1E+4.
@@ -473,7 +485,7 @@ namespace SeedCalc {
         ScalePerLargeUnit = 2500,
         NavLevel = 3,
         ScaleMarkerValueString = "500",
-        MinVisualizableNumber = 2000,
+        MinVisualizableNumber = 1000,
         MaxVisualizableNumber = 10000,
       },
 
@@ -499,7 +511,7 @@ namespace SeedCalc {
         NavLevel = 4,
         ScaleMarkerValueString = "10000",
         MinVisualizableNumber = 10000,
-        MaxVisualizableNumber = 2E+5,
+        MaxVisualizableNumber = 1e+5, // Max scale of this level is 2E+5,
       },
 
       // 1E+5 and 1E+6.
@@ -523,7 +535,7 @@ namespace SeedCalc {
         ScalePerLargeUnit = 2.5E+5,
         NavLevel = 5,
         ScaleMarkerValueString = "50000",
-        MinVisualizableNumber = 2E+5,
+        MinVisualizableNumber = 1E+5,
         MaxVisualizableNumber = 1E+6,
       },
 
@@ -549,7 +561,7 @@ namespace SeedCalc {
         NavLevel = 6,
         ScaleMarkerValueString = "7.5E+5",
         MinVisualizableNumber = 1E+6,
-        MaxVisualizableNumber = 1.5E+7,
+        MaxVisualizableNumber = 1E+7, // Max scale of this level is 1.5E+7,
       },
 
       // 1E+7 and 1E+8.
@@ -573,8 +585,8 @@ namespace SeedCalc {
         ScalePerLargeUnit = 3.75E+7,
         NavLevel = 7,
         ScaleMarkerValueString = "7.5E+6",
-        MinVisualizableNumber = 1.5E+7,
-        MaxVisualizableNumber = 1.5E+8,
+        MinVisualizableNumber = 1E+7,
+        MaxVisualizableNumber = 1E+8, // Max scale of this level is 1.5E+8,
       },
 
       // 1E+8 and 1E+9.
@@ -583,14 +595,14 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "Jupiter_Container",
             ObjName = "Jupiter",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -10f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
           new LevelConfig.RefObjConfig {
             ContainerName = "Sun_Container",
             ObjName = "Sun",
-            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
@@ -598,8 +610,8 @@ namespace SeedCalc {
         ScalePerLargeUnit = 3.75E+8,
         NavLevel = 8,
         ScaleMarkerValueString = "7.5E+7",
-        MinVisualizableNumber = 1.5E+8,
-        MaxVisualizableNumber = 1.5E+9,
+        MinVisualizableNumber = 1E+8,
+        MaxVisualizableNumber = 1E+9, // Max scale of this level is 1.5E+9,
       },
 
       // 1E+9 and 1E+10.
@@ -608,7 +620,7 @@ namespace SeedCalc {
           new LevelConfig.RefObjConfig {
             ContainerName = "Sun_Container",
             ObjName = "Sun",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.2f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
@@ -623,8 +635,8 @@ namespace SeedCalc {
         ScalePerLargeUnit = 1.5E+10,
         NavLevel = 9,
         ScaleMarkerValueString = "3E+9",
-        MinVisualizableNumber = 1.5E+9,
-        MaxVisualizableNumber = 6E+10,
+        MinVisualizableNumber = 1E+9,
+        MaxVisualizableNumber = 6E+10 // Max scale of this level is 6E+10,
       },
     };
   }
