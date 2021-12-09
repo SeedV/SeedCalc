@@ -280,8 +280,8 @@ namespace SeedCalc {
         case CalculatorInput.N8:
         case CalculatorInput.N9:
           if (!(ParsedExpression is null) && ParsedExpression.ExtractLastTokenText() == "0") {
-            // If there is only one "0" in the current number, replaces it with the next non-zero
-            // digit.
+            // If there is only one "0" in the current number, and the next input is a non-zero
+            // digit, deletes the "0" before appending the next digit.
             Backspace();
           }
           Append(input);

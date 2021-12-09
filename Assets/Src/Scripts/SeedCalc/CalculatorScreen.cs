@@ -144,7 +144,7 @@ namespace SeedCalc {
     private void PrintTo(TextMeshProUGUI where, string text) {
       if (string.IsNullOrEmpty(text)) {
         where.text = _initialText;
-      } else if (!string.IsNullOrEmpty(text)) {
+      } else {
         where.text = text;
       }
     }
