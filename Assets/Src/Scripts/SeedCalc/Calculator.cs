@@ -120,7 +120,7 @@ namespace SeedCalc {
     }
 
     // TODO: Adjust this limit when the screen size / font design is updated.
-    internal const int _maxChars = 50;
+    private const int _maxChars = 50;
     private const string _moduleName = "SeedCalc";
     private const int _calcAnimBlinkTimes = 3;
     private const float _calcAnimBlinkInterval = 0.1f;
