@@ -443,7 +443,7 @@ namespace SeedCalc {
       // Updates the input buffer since the expression could change during the calculation steps.
       _cachedExpression.Clear();
       _cachedExpression.Append(expression);
-      // SHows the final result.
+      // Shows the final result.
       Result = finalResult;
       State = CalculatorState.Okay;
     }
