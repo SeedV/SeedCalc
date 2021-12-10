@@ -13,16 +13,21 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using AgileMvvm;
 using SeedLang.Common;
 using SeedLang.Runtime;
+using UnityEngine;
 
 namespace SeedCalc {
   // The supported states of the calculator.
   public enum CalculatorState {
+    // The ready state.
     Okay,
+    // The calculating animation is being played.
+    Calculating,
     // The length of the input string exceeds the buffer limit, or the calculation exceeds the math
     // or data type limit.
     Overflow,
@@ -37,11 +42,19 @@ namespace SeedCalc {
       return Enum.GetName(typeof(CalculatorState), state);
     }
     public static bool IsOk(this CalculatorState state) {
-      return state == CalculatorState.Okay;
+      return state == CalculatorState.Okay || state == CalculatorState.Calculating;
     }
     public static bool IsError(this CalculatorState state) {
       return !IsOk(state);
     }
+  }
+
+  // The calculation modes that the calculator supports.
+  public enum CalculationMode {
+    // Completes the calculation immediately.
+    CalculateImmediately,
+    // Plays an animation to demonstrate the calculation steps.
+    DemoCalculationSteps,
   }
 
   // Supported calculator inputs.
@@ -56,6 +69,7 @@ namespace SeedCalc {
     public const string Div = "/";
     public const string Dot = ".";
     public const string Equal = "=";
+    public const string N00 = "00";
     public const string N0 = "0";
     public const string N1 = "1";
     public const string N2 = "2";
@@ -71,30 +85,46 @@ namespace SeedCalc {
   // The calculator class. It is a ViewModel class that manages the underlying calculation states,
   // e.g., via a SeedLang executor.
   public class Calculator : ViewModel {
-    private class Visualizer : IVisualizer<BinaryEvent>, IVisualizer<EvalEvent> {
+    // The intermediate state of each calculation step.
+    private class StepState {
       // The code range that is under execution.
-      public TextRange SourceRange { get; private set; }
+      public TextRange SourceRange { get; set; }
       // The result of the current execution step.
-      public IValue Result { get; private set; }
+      public double Result { get; set; }
+    }
 
-      public void On(BinaryEvent be) {
-        if (be.Range is TextRange range) {
-          SourceRange = range;
-        }
-        Result = be.Result;
+    private class Visualizer :
+        IVisualizer<UnaryEvent>, IVisualizer<BinaryEvent>, IVisualizer<EvalEvent> {
+      public List<StepState> StepStates { get; private set; } = new List<StepState>();
+      public double FinalResult { get; private set; }
+
+      public void On(UnaryEvent e) {
+        // Although SeedLang is able to separate unary operations from an expression, we ignore them
+        // intentionally so that a positive/negative number will be treated as a whole part.
       }
 
-      public void On(EvalEvent ee) {
-        if (ee.Range is TextRange range) {
-          SourceRange = range;
-        }
-        Result = ee.Value;
+      public void On(BinaryEvent e) {
+        RecordStep(e.Range as TextRange, e.Result.Number);
+      }
+
+      public void On(EvalEvent e) {
+        FinalResult = e.Value.Number;
+      }
+
+      private void RecordStep(TextRange range, double result) {
+        StepStates.Add(new StepState {
+          SourceRange = range,
+          Result = result,
+        });
       }
     }
 
+    // TODO: Adjust this limit when the screen size / font design is updated.
+    private const int _maxChars = 50;
     private const string _moduleName = "SeedCalc";
-    private const string _evalPrefix = "eval ";
-    private const int _maxChars = 100;
+    private const int _calcAnimBlinkTimes = 3;
+    private const float _calcAnimBlinkInterval = 0.1f;
+    private const float _calcAnimInterval = 0.4f;
 
     [BindableProperty]
     public CalculatorState State {
@@ -103,16 +133,38 @@ namespace SeedCalc {
     }
 
     [BindableProperty]
-    public DisplayContent DisplayContent {
-      get => _displayContent;
-      set => MvvmSetter(ref _displayContent, value);
+    public ParsedExpression ParsedExpression {
+      get => _parsedExpression;
+      set => MvvmSetter(ref _parsedExpression, value);
     }
 
+    [BindableProperty]
+    // A nullable value. It is null when there is no calculation result yet.
+    public double? Result {
+      get => _result;
+      set => MvvmSetter(ref _result, value);
+    }
+
+    public CalculationMode CalculationMode { get; set; } = CalculationMode.CalculateImmediately;
+
+    public bool AcceptingInput => State != CalculatorState.Calculating;
+
+    public bool HasResult => !(Result is null);
+
+    private GameManager _gameManager;
     private CalculatorState _state;
-    private readonly StringBuilder _cachedInput = new StringBuilder();
-    private DisplayContent _displayContent = null;
+    private readonly StringBuilder _cachedExpression = new StringBuilder();
+    private ParsedExpression _parsedExpression = null;
+    private double? _result = null;
+
+    public Calculator(CalculationMode calculationMode, GameManager gameManager) {
+      CalculationMode = calculationMode;
+      _gameManager = gameManager;
+    }
 
     public void OnInput(string input) {
+      Debug.Assert(AcceptingInput);
+
       // A simple state machine.
       if (State.IsError()) {
         switch (input) {
@@ -131,6 +183,43 @@ namespace SeedCalc {
             // error state.
             break;
         }
+      } else if (HasResult) {
+        switch (input) {
+          case CalculatorInput.AllClear:
+            AllClear();
+            break;
+          case CalculatorInput.Del:
+            // When there is already a calculating result, a Del key modifies the input buffer and
+            // switches back to a no-result state - this enables users to edit the expression
+            // in-place even after the result has been got.
+            Result = null;
+            Backspace();
+            Parse();
+            break;
+          case CalculatorInput.Equal:
+            break;
+          case CalculatorInput.N0:
+          case CalculatorInput.N00:
+          case CalculatorInput.N1:
+          case CalculatorInput.N2:
+          case CalculatorInput.N3:
+          case CalculatorInput.N4:
+          case CalculatorInput.N5:
+          case CalculatorInput.N6:
+          case CalculatorInput.N7:
+          case CalculatorInput.N8:
+          case CalculatorInput.N9:
+            // For numbers, clears the input buffer and the result, then starts from a new
+            // expresion.
+            _cachedExpression.Clear();
+            Result = null;
+            HandleVisibleKeys(input);
+            break;
+          default:
+            Result = null;
+            HandleVisibleKeys(input);
+            break;
+        }
       } else {
         switch (input) {
           case CalculatorInput.AllClear:
@@ -143,23 +232,79 @@ namespace SeedCalc {
           case CalculatorInput.Equal:
             Execute();
             break;
-          case CalculatorInput.Dot:
-            // Adds the leading zero before a single dot.
-            if (_cachedInput.Length <= 0) {
-              Append(CalculatorInput.N0);
-            }
-            Append(CalculatorInput.Dot);
-            if (State.IsOk()) {
-              Parse();
-            }
-            break;
           default:
-            Append(input);
-            if (State.IsOk()) {
-              Parse();
-            }
+            HandleVisibleKeys(input);
             break;
         }
+      }
+    }
+
+    private void HandleVisibleKeys(string input) {
+      switch (input) {
+        case CalculatorInput.Dot:
+          // Do not repeat dots.
+          char lastChar = !(ParsedExpression is null) && ParsedExpression.Expression.Length > 0 ?
+              ParsedExpression.Expression[ParsedExpression.Expression.Length - 1] : '\0';
+          if (lastChar != CalculatorInput.Dot[0]) {
+            // Adds a leading zero if "." is the first input of a number.
+            if (ParsedExpression is null || !ParsedExpression.LastTokenIsNumber()) {
+              Append(CalculatorInput.N0);
+            }
+            Append(input);
+          }
+          break;
+        case CalculatorInput.N0:
+          // A number can be "0", but cannot be "0123".
+          if (ParsedExpression is null || !ParsedExpression.LastTokenIsNumber()) {
+            Append(input);
+          } else if (ParsedExpression.ExtractLastTokenText() != "0") {
+            Append(input);
+          }
+          break;
+        case CalculatorInput.N00:
+          // A number can be neither "00" nor "00123".
+          if (ParsedExpression is null || !ParsedExpression.LastTokenIsNumber()) {
+            // To start a number, only one "0" is appended.
+            Append(CalculatorInput.N0);
+          } else if (ParsedExpression.ExtractLastTokenText() != "0") {
+            Append(input);
+          }
+          break;
+        case CalculatorInput.N1:
+        case CalculatorInput.N2:
+        case CalculatorInput.N3:
+        case CalculatorInput.N4:
+        case CalculatorInput.N5:
+        case CalculatorInput.N6:
+        case CalculatorInput.N7:
+        case CalculatorInput.N8:
+        case CalculatorInput.N9:
+          if (!(ParsedExpression is null) && ParsedExpression.ExtractLastTokenText() == "0") {
+            // If there is only one "0" in the current number, and the next input is a non-zero
+            // digit, deletes the "0" before appending the next digit.
+            Backspace();
+          }
+          Append(input);
+          break;
+        case CalculatorInput.Add:
+        case CalculatorInput.Sub:
+        case CalculatorInput.Mul:
+        case CalculatorInput.Div:
+          // If starting an expression with an operator, a leading "0" is added. Although "+" and
+          // "-" can also be treated as positive/negative operators, we follow this logic to make
+          // the expression clearer.
+          if (ParsedExpression is null) {
+            Append(CalculatorInput.N0);
+          }
+          Append(input);
+          break;
+        default:
+          Append(input);
+          break;
+      }
+      if (State.IsOk()) {
+        // Parses the input and updates ParsedExpression.
+        Parse();
       }
     }
 
@@ -170,78 +315,146 @@ namespace SeedCalc {
 
     // Clears the input buffer and the tokens for display.
     private void AllClear() {
-      _cachedInput.Clear();
-      DisplayContent = null;
+      _cachedExpression.Clear();
+      ParsedExpression = null;
+      Result = null;
     }
 
-    // Appends the input character to the buffer.
+    // Appends the input character to the end of the buffer.
     private void Append(string input) {
-      _cachedInput.Append(input);
-      if (_cachedInput.Length > _maxChars) {
+      _cachedExpression.Append(input);
+      if (_cachedExpression.Length > _maxChars) {
         State = CalculatorState.Overflow;
       }
     }
 
     // Removes the last character from the buffer.
     private void Backspace() {
-      if (_cachedInput.Length > 0) {
-        _cachedInput.Remove(_cachedInput.Length - 1, 1);
+      if (_cachedExpression.Length > 0) {
+        _cachedExpression.Remove(_cachedExpression.Length - 1, 1);
       }
     }
 
     // Parses the input string to an expression.
     private void Parse() {
-      string expression = _cachedInput.ToString();
-      if (string.IsNullOrEmpty(expression)) {
-        DisplayContent = null;
+      var syntaxTokens = ParseExpression(out string expression);
+      if (syntaxTokens is null) {
+        ParsedExpression = null;
         return;
+      } else {
+        ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, false);
       }
-      var collection = new DiagnosticCollection();
-      var executor = new Executor();
-      executor.Parse(expression, _moduleName, SeedXLanguage.Python, collection);
-      DisplayContent = new DisplayContent(expression, executor.SyntaxTokens, null);
+    }
+
+    private IReadOnlyList<SyntaxToken> ParseExpression(out string expression) {
+      expression = _cachedExpression.ToString();
+      if (string.IsNullOrEmpty(expression)) {
+        return null;
+      } else {
+        return Executor.ParseSyntaxTokens(expression, _moduleName, SeedXLanguage.SeedCalc, null);
+      }
     }
 
     // Executes the current expression.
     private void Execute() {
-      string expression = _cachedInput.ToString();
-      if (string.IsNullOrEmpty(expression)) {
-        DisplayContent = null;
+      var syntaxTokens = ParseExpression(out string expression);
+      if (syntaxTokens is null) {
+        ParsedExpression = null;
         return;
       }
-
-      // For now SeedPython only executes full "eval" statements.
-      string source = _evalPrefix + " " + expression;
       var executor = new Executor();
-      var collection = new DiagnosticCollection();
-      if (!executor.Parse(source, _moduleName, SeedXLanguage.Python, collection)) {
-        State = CalculatorState.Syntax;
-        return;
-      }
       var visualizer = new Visualizer();
       executor.Register(visualizer);
-      collection = new DiagnosticCollection();
-      executor.Run(RunType.Ast, collection);
-      executor.Unregister(visualizer);
-
-      if (collection.Diagnostics.Count > 0) {
+      var collection = new DiagnosticCollection();
+      if (!executor.Run(expression,
+                        _moduleName,
+                        SeedXLanguage.SeedCalc,
+                        RunType.Ast,
+                        collection)) {
+        Debug.Assert(collection.Diagnostics.Count > 0);
         switch (collection.Diagnostics[0].MessageId) {
           case Message.RuntimeErrorDivideByZero:
             State = CalculatorState.DivBy0;
             break;
           case Message.RuntimeOverflow:
-          default:
             State = CalculatorState.Overflow;
             break;
+          default:
+            State = CalculatorState.Syntax;
+            break;
         }
+        executor.Unregister(visualizer);
       } else {
-        string resultText = visualizer.Result.ToString();
-        var resultRange = new TextRange(1, 0, 1, resultText.Length - 1);
-        var resultToken = new SyntaxToken(SyntaxType.Number, resultRange);
-        var resultTokens = new List<SyntaxToken> { resultToken };
-        DisplayContent = new DisplayContent(resultText, resultTokens, null);
+        executor.Unregister(visualizer);
+        if (CalculationMode == CalculationMode.CalculateImmediately) {
+          ParsedExpression =
+              new ParsedExpression(expression, syntaxTokens, null, false);
+          Result = visualizer.FinalResult;
+        } else if (CalculationMode == CalculationMode.DemoCalculationSteps) {
+          var coroutine = CalculationSteps(executor,
+                                           expression,
+                                           syntaxTokens,
+                                           visualizer.StepStates,
+                                           visualizer.FinalResult);
+          _gameManager.StartCoroutine(coroutine);
+        }
       }
-      _cachedInput.Clear();
+    }
+
+    private IEnumerator CalculationSteps(Executor executor,
+                                         string expression,
+                                         IReadOnlyList<SyntaxToken> syntaxTokens,
+                                         IReadOnlyList<StepState> stepStates,
+                                         double finalResult) {
+      State = CalculatorState.Calculating;
+      while (stepStates.Count > 0) {
+        var highlightedRange = stepStates[0].SourceRange;
+        for (int i = 0; i < _calcAnimBlinkTimes; i++) {
+          // Shows the highlighted expression.
+          ParsedExpression =
+              new ParsedExpression(expression, syntaxTokens, highlightedRange, true);
+          yield return new WaitForSeconds(_calcAnimBlinkInterval);
+          // Shows the un-highlighted expression.
+          ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, true);
+          yield return new WaitForSeconds(_calcAnimBlinkInterval);
+        }
+        yield return new WaitForSeconds(_calcAnimInterval);
+        // Replaces the calculated part with the intermediate step result.
+        expression = UpdateExpressionWithStepResult(expression,
+                                                    highlightedRange,
+                                                    stepStates[0].Result);
+        // The new expression has to be re-parsed and re-calculated.
+        var visualizer = new Visualizer();
+        syntaxTokens = Executor.ParseSyntaxTokens(expression,
+                                                  _moduleName,
+                                                  SeedXLanguage.SeedCalc,
+                                                  null);
+        executor.Register(visualizer);
+        executor.Run(expression, _moduleName, SeedXLanguage.SeedCalc, RunType.Ast, null);
+        stepStates = visualizer.StepStates;
+        executor.Unregister(visualizer);
+        // Shows the new expression.
+        ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, true);
+        if (stepStates.Count > 0) {
+          yield return new WaitForSeconds(_calcAnimInterval);
+        }
+      }
+      ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, false);
+      // Updates the input buffer since the expression could change during the calculation steps.
+      _cachedExpression.Clear();
+      _cachedExpression.Append(expression);
+      // Shows the final result.
+      Result = finalResult;
+      State = CalculatorState.Okay;
+    }
+
+    private string UpdateExpressionWithStepResult(string originalExpression,
+                                                  TextRange range,
+                                                  double result) {
+      return originalExpression.Substring(0, range.Start.Column) +
+          NumberFormatter.Format(result) +
+          originalExpression.Substring(range.End.Column + 1,
+                                       originalExpression.Length - range.End.Column - 1);
     }
   }
 }

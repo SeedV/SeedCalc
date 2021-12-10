@@ -18,57 +18,240 @@ namespace SeedCalc.Tests {
   public class CalculatorTests {
     [Test]
     public void TestCalculator() {
-      var calculator = new Calculator();
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
       Assert.True(calculator.State.IsOk());
 
       calculator.OnInput("1");
       calculator.OnInput("=");
-      Assert.AreEqual("1", calculator.DisplayContent.Expression);
+      Assert.AreEqual("1", calculator.ParsedExpression.Expression);
       Assert.True(calculator.State.IsOk());
       calculator.OnInput("AC");
-      Assert.IsNull(calculator.DisplayContent);
+      Assert.Null(calculator.ParsedExpression);
       Assert.True(calculator.State.IsOk());
 
       calculator.OnInput("1");
-      Assert.AreEqual("1", calculator.DisplayContent.Expression);
+      Assert.AreEqual("1", calculator.ParsedExpression.Expression);
       calculator.OnInput("+");
-      Assert.AreEqual("1+", calculator.DisplayContent.Expression);
+      Assert.AreEqual("1+", calculator.ParsedExpression.Expression);
       calculator.OnInput("2");
-      Assert.AreEqual("1+2", calculator.DisplayContent.Expression);
+      Assert.AreEqual("1+2", calculator.ParsedExpression.Expression);
       Assert.True(calculator.State.IsOk());
       calculator.OnInput("=");
-      Assert.AreEqual("3", calculator.DisplayContent.Expression);
+      Assert.AreEqual("1+2", calculator.ParsedExpression.Expression);
+      Assert.AreEqual(3, calculator.Result);
+      Assert.True(calculator.State.IsOk());
+    }
+
+    [Test]
+    public void TestDel() {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      calculator.OnInput("1");
+      calculator.OnInput("Del");
+      calculator.OnInput("Del");
+      Assert.Null(calculator.ParsedExpression);
+      calculator.OnInput("1");
+      calculator.OnInput("2");
+      calculator.OnInput("3");
+      calculator.OnInput("(");
+      calculator.OnInput(")");
+      calculator.OnInput("(");
+      calculator.OnInput(")");
+      calculator.OnInput("Del");
+      calculator.OnInput("Del");
+      Assert.AreEqual("123()", calculator.ParsedExpression.Expression);
+    }
+
+    [Test]
+    public void TestDot() {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      calculator.OnInput(".");
+      Assert.AreEqual("0.", calculator.ParsedExpression.Expression);
+      calculator.OnInput(".");
+      calculator.OnInput(".");
+      calculator.OnInput(".");
+      Assert.AreEqual("0.", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("0.3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("AC");
+      calculator.OnInput("3");
+      calculator.OnInput(".");
+      calculator.OnInput(".");
+      calculator.OnInput("5");
+      calculator.OnInput("+");
+      calculator.OnInput(".");
+      Assert.AreEqual("3.5+0.", calculator.ParsedExpression.Expression);
+      calculator.OnInput(".");
+      Assert.AreEqual("3.5+0.", calculator.ParsedExpression.Expression);
+      calculator.OnInput("5");
+      Assert.AreEqual("3.5+0.5", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual("3.5+0.5", calculator.ParsedExpression.Expression);
+      Assert.AreEqual(4, calculator.Result);
+      Assert.True(calculator.State.IsOk());
+    }
+
+    [Test]
+    public void TestZero() {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      calculator.OnInput("0");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("0");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("00");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("00");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("+");
+      calculator.OnInput("0");
+      Assert.AreEqual("3+0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("3+3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("0");
+      Assert.AreEqual("3+30", calculator.ParsedExpression.Expression);
+      calculator.OnInput("0");
+      Assert.AreEqual("3+300", calculator.ParsedExpression.Expression);
+      calculator.OnInput("00");
+      Assert.AreEqual("3+30000", calculator.ParsedExpression.Expression);
       Assert.True(calculator.State.IsOk());
       calculator.OnInput("AC");
+      calculator.OnInput("00");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("AC");
+      calculator.OnInput("3");
+      calculator.OnInput("*");
+      calculator.OnInput("00");
+      Assert.AreEqual("3*0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("3*3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("AC");
+      calculator.OnInput("00");
+      calculator.OnInput("0");
+      calculator.OnInput("*");
+      calculator.OnInput("3");
+      Assert.AreEqual("0*3", calculator.ParsedExpression.Expression);
+      // Auto-added "0" for operators at the beginning.
+      calculator.OnInput("AC");
+      calculator.OnInput("*");
+      Assert.AreEqual("0*", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("0*3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(0, calculator.Result);
+      calculator.OnInput("AC");
+      calculator.OnInput("/");
+      Assert.AreEqual("0/", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("0/3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(0, calculator.Result);
+    }
+
+    [Test]
+    public void TestPositiveAndNegative() {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      calculator.OnInput("+");
+      calculator.OnInput("3");
+      Assert.AreEqual("0+3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(3, calculator.Result);
+      calculator.OnInput("AC");
+      calculator.OnInput("-");
+      calculator.OnInput("3");
+      Assert.AreEqual("0-3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(-3, calculator.Result);
+      calculator.OnInput("AC");
+      calculator.OnInput("3");
+      calculator.OnInput("+");
+      calculator.OnInput("-");
+      calculator.OnInput("3");
+      Assert.AreEqual("3+-3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(0, calculator.Result);
+      calculator.OnInput("AC");
+      calculator.OnInput("3");
+      calculator.OnInput("-");
+      calculator.OnInput("+");
+      calculator.OnInput("3");
+      Assert.AreEqual("3-+3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(0, calculator.Result);
+    }
+
+    [Test]
+    public void TestAfterCalculation() {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      calculator.OnInput("3");
+      calculator.OnInput("+");
+      calculator.OnInput("3");
+      calculator.OnInput("=");
+      Assert.AreEqual("3+3", calculator.ParsedExpression.Expression);
+      Assert.AreEqual(6, calculator.Result);
+      // After a calculation, a new number input triggers a new expression.
+      calculator.OnInput("0");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("+");
+      calculator.OnInput("8");
+      calculator.OnInput("=");
+      Assert.AreEqual("0+8", calculator.ParsedExpression.Expression);
+      Assert.AreEqual(8, calculator.Result);
+      // While other characters continue to append on to the existing expression.
+      calculator.OnInput("*");
+      Assert.AreEqual("0+8*", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("0+8*3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual(24, calculator.Result);
+      // Del modifies the existing expression inline.
+      calculator.OnInput("Del");
+      Assert.AreEqual("0+8*", calculator.ParsedExpression.Expression);
+      calculator.OnInput("Del");
+      Assert.AreEqual("0+8", calculator.ParsedExpression.Expression);
+      calculator.OnInput("Del");
+      Assert.AreEqual("0+", calculator.ParsedExpression.Expression);
+      calculator.OnInput("(");
+      calculator.OnInput("8");
+      calculator.OnInput("-");
+      calculator.OnInput("3");
+      calculator.OnInput(")");
+      calculator.OnInput("=");
+      Assert.AreEqual("0+(8-3)", calculator.ParsedExpression.Expression);
+      Assert.AreEqual(5, calculator.Result);
     }
 
     [Test]
     public void TestSyntaxError() {
-      var calculator = new Calculator();
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
       calculator.OnInput("1");
       calculator.OnInput("+");
       calculator.OnInput("=");
       Assert.True(calculator.State.IsError());
       Assert.AreEqual(CalculatorState.Syntax, calculator.State);
-      calculator.OnInput("AC");
+      calculator.OnInput("(");
+      calculator.OnInput("(");
+      calculator.OnInput(".");
+      calculator.OnInput(")");
+      Assert.True(calculator.State.IsError());
+      Assert.AreEqual(CalculatorState.Syntax, calculator.State);
     }
 
     [Test]
     public void TestDivByZero() {
-      var calculator = new Calculator();
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
       calculator.OnInput("1");
       calculator.OnInput("/");
       calculator.OnInput("0");
       calculator.OnInput("=");
       Assert.True(calculator.State.IsError());
       Assert.AreEqual(CalculatorState.DivBy0, calculator.State);
-      calculator.OnInput("AC");
     }
 
     [Test]
     public void TestInputOverflow() {
-      var calculator = new Calculator();
-      for (int i = 0; i < 100; i++) {
+      var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
+      for (int i = 0; i < 50; i++) {
         calculator.OnInput("9");
       }
       Assert.True(calculator.State.IsOk());

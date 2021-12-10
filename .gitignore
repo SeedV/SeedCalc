@@ -78,3 +78,7 @@ crashlytics-build.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Non-opensource assets are maintained by a private repo.
+*NonOpenSource
+*NonOpenSource.meta

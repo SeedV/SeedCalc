@@ -30,22 +30,16 @@ namespace SeedCalc {
 
     public Sprite[] Sprites;
 
-    private TextMeshProUGUI _scaleMarker;
+    public TextMeshProUGUI ScaleMarker;
 
     public void SetNavLevel(int navLevel, string scaleMarkerValueString) {
       Debug.Assert(navLevel >= MinLevel && navLevel <= MaxLevel);
       GetComponent<Image>().sprite = Sprites[navLevel - MinLevel];
-      _scaleMarker.text = scaleMarkerValueString;
+      ScaleMarker.text = scaleMarkerValueString;
     }
 
     public void Show(bool visible) {
       gameObject.SetActive(visible);
-    }
-
-    void Start() {
-      var t = transform.Find("Scale").Find("ScaleMarker");
-      Debug.Assert(!(t is null));
-      _scaleMarker = t.gameObject.GetComponent<TextMeshProUGUI>();
     }
   }
 }

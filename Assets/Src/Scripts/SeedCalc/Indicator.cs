@@ -24,12 +24,14 @@ namespace SeedCalc {
     private const float _indicatorValueOriginY = -210f;
     private const float _indicatorUnitSize = 45f;
 
+    private bool _visible;
+
     public TextMeshProUGUI IndicatorValue;
 
     public void SetValue(double maxValueOfCurrentLevel, double value) {
       Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
-      if (VisualizableNumber.IsVisualizable(value)) {
-        IndicatorValue.text = VisualizableNumber.Format(value);
+      if (LevelConfigs.IsVisualizable(value)) {
+        IndicatorValue.text = NumberFormatter.Format(value);
         float percentage = (float)(value / maxValueOfCurrentLevel);
         transform.localScale = new Vector3(1f, percentage, 1f);
         // Hides the indicator value until it's correctly positioned in the next frame.
@@ -43,9 +45,13 @@ namespace SeedCalc {
       }
     }
 
-    public void Show(bool visible) {
-      IndicatorValue.gameObject.SetActive(visible);
-      gameObject.gameObject.SetActive(visible);
+    public bool Visible {
+      get => _visible;
+      set {
+        IndicatorValue.gameObject.SetActive(value);
+        gameObject.gameObject.SetActive(value);
+        _visible = value;
+      }
     }
 
     void Start() {
