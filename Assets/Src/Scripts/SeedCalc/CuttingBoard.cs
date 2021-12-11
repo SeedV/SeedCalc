@@ -61,11 +61,20 @@ namespace SeedCalc {
     private int _currentLevel = -1;
     // Queued numbers to be visualized.
     private readonly Queue<double> _numberQueue = new Queue<double>();
-    // Map from the level index to the control object of every desc panel.
-    private Dictionary<int, GameObject> _descPanels = new Dictionary<int, GameObject>();
+    // Map from (level, objName) to the description box of a reference object. A reference object
+    // may appear in more than one levels and may have diffrent description boxes in different
+    // levels.
+    private Dictionary<(int level, string objName), GameObject> _descBoxes =
+        new Dictionary<(int level, string objName), GameObject>();
     // Map from the reference object name to its container object and its own game object.
     private Dictionary<string, (GameObject Container, GameObject Obj)> _refObjs =
         new Dictionary<string, (GameObject Container, GameObject Obj)>();
+    // The config indices of the left object and right object on each level. A level's left object
+    // and right object can be randomly chosen from a list of candidates. This array is used to hold
+    // the current objects showed on each level. leftObjIndex is set to -1 in case the level has
+    // only one major object.
+    private (int leftObjIndex, int rightObjIndex)[] _levelObjs =
+        new (int leftObjIndex, int rightObjIndex)[LevelConfigs.Levels.Count];
 
     // Queues a new number to be visualized. A transition between two visualization levels might not
     // be completed within one frame, thus a queue is used to hold the numbers to be visualized. A
@@ -79,6 +88,10 @@ namespace SeedCalc {
 
     public void OnCalculatorParsedExpressionUpdated(object sender, UpdatedEvent.Args args) {
       if (args.Value is null) {
+        // In public interfaces, do NOT update the internal states (e.g., Indicator.Visible = false)
+        // directly, since the queued numbers access the internal states in an asynchronous way.
+        // It's recommended to queue a non-visualizable number to turn off the indicator.
+        QueueNewNumber(_nonVisualizableNumber);
         return;
       }
       var parsedExpression = args.Value as ParsedExpression;
@@ -88,9 +101,6 @@ namespace SeedCalc {
           parsedExpression.TryParseNumber(0, out double number)) {
         QueueNewNumber(number);
       } else {
-        // In public interfaces, do NOT update the internal states (e.g., Indicator.Visible = false)
-        // directly, since the queued numbers access the internal states in an asynchronous way.
-        // It's recommended to queue a non-visualizable number to turn off the indicator.
         QueueNewNumber(_nonVisualizableNumber);
       }
     }
@@ -127,7 +137,7 @@ namespace SeedCalc {
       LightingMask.SetActive(active);
       Nav.Show(active);
       Indicator.Visible = active;
-      ShowCurrentRefObjs(active);
+      ShowRefObjsAtLevel(_currentLevel, active);
       if (active && _currentLevel < 0) {
         Indicator.Visible = false;
         Nav.SetNavLevel(Nav.DefaultLevel, Nav.DefaultMarkerValueString);
@@ -153,7 +163,7 @@ namespace SeedCalc {
             }
             // Hides indicator and desc panels during the transition.
             Indicator.Visible = false;
-            ShowCurrentDescPanels(false);
+            ShowDescBoxesAtLevel(_currentLevel, false);
             if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
               // Slides to the left/right neighbor level.
               var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
@@ -172,12 +182,12 @@ namespace SeedCalc {
               if (!(objectToHideAfterAnim is null)) {
                 objectToHideAfterAnim.SetActive(false);
               }
-              PlaySound(JumpToSound);
+              PlaySound(SlideToSound);
             } else if (_currentLevel != level) {
               // Jumps to the target level directly. For now there is no transition animation when
               // jumping to a non-neighbor level.
               JumpToLevel(level);
-              PlaySound(PlayAnimSound);
+              PlaySound(JumpToSound);
             }
             // Shows everything up once the transition is done.
             _currentLevel = level;
@@ -187,7 +197,7 @@ namespace SeedCalc {
             Indicator.Visible = true;
             double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
             Indicator.SetValue(indicatorMax, number);
-            ShowCurrentDescPanels(true);
+            ShowDescBoxesAtLevel(_currentLevel, true);
           } else {
             // When a number is not able to be visualized, we do not turn the whole board to its
             // inactive mode. Instead, we simply hide the number indicator while keeping the
@@ -201,57 +211,125 @@ namespace SeedCalc {
 
     private void SetupRefObjs() {
       _refObjs.Clear();
-      foreach (var config in LevelConfigs.Levels) {
-        foreach (var refObjectConfig in config.RefObjs) {
-          if (!_refObjs.ContainsKey(refObjectConfig.ObjName)) {
-            var container = RootOfRefObjs.transform.Find(refObjectConfig.ContainerName);
-            Debug.Assert(!(container is null));
-            var obj = container.transform.Find(refObjectConfig.ObjName);
-            obj.gameObject.SetActive(true);
-            container.gameObject.SetActive(false);
-            _refObjs.Add(refObjectConfig.ObjName, (container.gameObject, obj.gameObject));
+      for (int level = 0; level < LevelConfigs.Levels.Count; level++) {
+        var config = LevelConfigs.Levels[level];
+        PreloadCandidateObjs(level);
+        ChooseRefObjsRandomly();
+      }
+    }
+
+    private void PreloadCandidateObjs(int level) {
+      foreach (var refObjConfig in LevelConfigs.LeftAndRightCandidates(level)) {
+        if (!_refObjs.ContainsKey(refObjConfig.ObjName)) {
+          string containerName = LevelConfigs.GetContainerName(refObjConfig.ObjName);
+          var container = RootOfRefObjs.transform.Find(containerName);
+          Debug.Assert(!(container is null));
+          var obj = container.transform.Find(refObjConfig.ObjName);
+          obj.gameObject.SetActive(true);
+          container.gameObject.SetActive(false);
+          _refObjs.Add(refObjConfig.ObjName, (container.gameObject, obj.gameObject));
+        }
+      }
+    }
+
+    private void ChooseRefObjsRandomly() {
+      for (int level = 0; level < LevelConfigs.Levels.Count; level++) {
+        var config = LevelConfigs.Levels[level];
+        int leftObjIndex = -1;
+        if (!(config.LeftObjCandidates is null) && level > 0) {
+          // The left/small object must be the same as the right/large object of the previous level.
+          leftObjIndex = _levelObjs[level - 1].rightObjIndex;
+        }
+        Debug.Assert(!(config.RightObjCandidates is null));
+        // The right/large object can be randomly chosen from the candidate list.
+        int rightObjIndex = config.RightObjCandidates.Length <= 1 ? 0:
+            Random.Range(0, config.RightObjCandidates.Length);
+        _levelObjs[level] = (leftObjIndex, rightObjIndex);
+      }
+    }
+
+    private void SetupDescPanels() {
+      _descBoxes.Clear();
+      for (int level = 0; level < LevelConfigs.Levels.Count; level++) {
+        string descPanelName = LevelConfigs.GetDescPanelName(level);
+        var panel = RootOfDescPanels.transform.Find(descPanelName);
+        if (!(panel is null)) {
+          panel.gameObject.SetActive(true);
+          var config = LevelConfigs.Levels[level];
+          foreach (var refObjConfig in LevelConfigs.LeftAndRightCandidates(level)) {
+            string descName = LevelConfigs.GetDescName(refObjConfig.ObjName);
+            var descBox = panel.Find(descName);
+            if (!(descBox is null)) {
+              descBox.gameObject.SetActive(false);
+              _descBoxes.Add((level, refObjConfig.ObjName), descBox.gameObject);
+            }
           }
         }
       }
     }
 
-    private void SetupDescPanels() {
-      _descPanels.Clear();
-      for (int level = 0; level < LevelConfigs.Levels.Count; level++) {
-        var panel = RootOfDescPanels.transform.Find($"Level_{level}");
-        if (!(panel is null)) {
-          panel.gameObject.SetActive(false);
-          _descPanels.Add(level, panel.gameObject);
+    private void JumpToLevel(int level) {
+      ShowRefObjsAtLevel(_currentLevel, false);
+      // Re-chooses reference objects randomly for all levels when jumping to a non-neighbor level.
+      // On the other side, when the cuttong board slides to a neighbor level, the reference object
+      // must not change since a object of the current level will be staying on the cutting board.
+      ChooseRefObjsRandomly();
+      ShowRefObjsAtLevel(level, true);
+    }
+
+    private void ShowRefObjsAtLevel(int level, bool show) {
+      if (level >= 0) {
+        var config = LevelConfigs.Levels[level];
+        if (_levelObjs[level].leftObjIndex >= 0) {
+          ShowRefObj(level, config.LeftObjCandidates[_levelObjs[level].leftObjIndex], true, show);
         }
+        Debug.Assert(_levelObjs[level].rightObjIndex >= 0);
+        ShowRefObj(level, config.RightObjCandidates[_levelObjs[level].rightObjIndex], false, show);
       }
     }
 
-    private void JumpToLevel(int level) {
-      ShowCurrentRefObjs(false);
-      for (int i = 0; i < LevelConfigs.Levels[level].RefObjs.Length; i++) {
-        var refObjectConfig = LevelConfigs.Levels[level].RefObjs[i];
-        Debug.Assert(_refObjs.ContainsKey(refObjectConfig.ObjName));
-        var container = _refObjs[refObjectConfig.ObjName].Container;
-        container.transform.localPosition = refObjectConfig.InitialPosition;
-        container.transform.localScale = LevelConfigs.CalcInitialScale(level, i);
-        container.SetActive(true);
+    private void ShowRefObj(int level, RefObjConfig refObjConfig, bool isLeftObj, bool show) {
+      Debug.Assert(_refObjs.ContainsKey(refObjConfig.ObjName));
+      var container = _refObjs[refObjConfig.ObjName].Container;
+      if (show) {
+        container.transform.localPosition = refObjConfig.InitialPosition;
+        container.transform.localScale = LevelConfigs.CalcInitialScale(level, isLeftObj);
+      }
+      container.SetActive(show);
+    }
+
+    private void ShowDescBoxesAtLevel(int level, bool show) {
+      if (level >= 0) {
+        var config = LevelConfigs.Levels[level];
+        if (_levelObjs[level].leftObjIndex >= 0) {
+          string leftObjName = config.LeftObjCandidates[_levelObjs[level].leftObjIndex].ObjName;
+          if (_descBoxes.TryGetValue((level, leftObjName), out var leftDescBox)) {
+            leftDescBox.SetActive(show);
+          }
+        }
+        Debug.Assert(_levelObjs[level].rightObjIndex >= 0);
+        string rightObjName = config.RightObjCandidates[_levelObjs[level].rightObjIndex].ObjName;
+        if (_descBoxes.TryGetValue((level, rightObjName), out var rightDescBox)) {
+          rightDescBox.SetActive(show);
+        }
       }
     }
 
     private IReadOnlyList<SlideAnimConfig> PrepareSlideTransition(
         int level, out GameObject objectToHideAfterAnim) {
-      var configs = new List<SlideAnimConfig>();
+      var animConfigs = new List<SlideAnimConfig>();
+      var currentLevelConfig = LevelConfigs.Levels[_currentLevel];
+      var targetLevelConfig = LevelConfigs.Levels[level];
       if (_currentLevel == level + 1) {
         // Slides to left.
-        int numLeftObjs = LevelConfigs.Levels[level].RefObjs.Length;
-        if (numLeftObjs >= 2) {
-          var leftConfig = LevelConfigs.Levels[level].RefObjs[0];
-          var leftScale = LevelConfigs.CalcInitialScale(level, 0);
+        if (_levelObjs[level].leftObjIndex >= 0) {
+          var leftConfig = targetLevelConfig.LeftObjCandidates[_levelObjs[level].leftObjIndex];
+          var leftScale = LevelConfigs.CalcInitialScale(level, true);
           var leftContainer = _refObjs[leftConfig.ObjName].Container;
           leftContainer.transform.localPosition = leftConfig.VanishingPosition;
           leftContainer.transform.localScale = leftScale / 10.0f;
           leftContainer.SetActive(true);
-          configs.Add(new SlideAnimConfig {
+          animConfigs.Add(new SlideAnimConfig {
             Actor = leftContainer,
             FromPosition = leftContainer.transform.localPosition,
             ToPosition = leftConfig.InitialPosition,
@@ -260,12 +338,13 @@ namespace SeedCalc {
           });
         }
 
-        var midConfig = LevelConfigs.Levels[_currentLevel].RefObjs[0];
-        var midScale = LevelConfigs.CalcInitialScale(_currentLevel, 0);
-        var targetConfig = LevelConfigs.Levels[level].RefObjs[numLeftObjs - 1];
-        var targetScale = LevelConfigs.CalcInitialScale(level, numLeftObjs - 1);
+        var midConfig =
+            currentLevelConfig.LeftObjCandidates[_levelObjs[_currentLevel].leftObjIndex];
+        var midScale = LevelConfigs.CalcInitialScale(_currentLevel, true);
+        var targetConfig = targetLevelConfig.RightObjCandidates[_levelObjs[level].rightObjIndex];
+        var targetScale = LevelConfigs.CalcInitialScale(level, false);
         var midContainer = _refObjs[midConfig.ObjName].Container;
-        configs.Add(new SlideAnimConfig {
+        animConfigs.Add(new SlideAnimConfig {
           Actor = midContainer,
           FromPosition = midConfig.InitialPosition,
           ToPosition = targetConfig.InitialPosition,
@@ -273,30 +352,25 @@ namespace SeedCalc {
           ToScale = targetScale,
         });
 
-        int numCurrentObjs = LevelConfigs.Levels[_currentLevel].RefObjs.Length;
-        if (numCurrentObjs >= 2) {
-          var rightConfig = LevelConfigs.Levels[_currentLevel].RefObjs[1];
-          var rightScale = LevelConfigs.CalcInitialScale(_currentLevel, 1);
-          var rightContainer = _refObjs[rightConfig.ObjName].Container;
-          configs.Add(new SlideAnimConfig {
-            Actor = rightContainer,
-            FromPosition = rightConfig.InitialPosition,
-            ToPosition = rightConfig.VanishingPosition,
-            FromScale = rightScale,
-            ToScale = rightScale * 10.0f,
-          });
-          objectToHideAfterAnim = rightContainer;
-        } else {
-          objectToHideAfterAnim = null;
-        }
+        var rightConfig =
+            currentLevelConfig.RightObjCandidates[_levelObjs[_currentLevel].rightObjIndex];
+        var rightScale = LevelConfigs.CalcInitialScale(_currentLevel, false);
+        var rightContainer = _refObjs[rightConfig.ObjName].Container;
+        animConfigs.Add(new SlideAnimConfig {
+          Actor = rightContainer,
+          FromPosition = rightConfig.InitialPosition,
+          ToPosition = rightConfig.VanishingPosition,
+          FromScale = rightScale,
+          ToScale = rightScale * 10.0f,
+        });
+        objectToHideAfterAnim = rightContainer;
       } else if (_currentLevel == level - 1) {
         // Slides to right.
-        int numCurrentObjs = LevelConfigs.Levels[_currentLevel].RefObjs.Length;
-        if (numCurrentObjs >= 2) {
-          var leftConfig = LevelConfigs.Levels[_currentLevel].RefObjs[0];
-          var leftScale = LevelConfigs.CalcInitialScale(_currentLevel, 0);
+        if (_levelObjs[_currentLevel].leftObjIndex >= 0) {
+          var leftConfig = currentLevelConfig.LeftObjCandidates[_levelObjs[_currentLevel].leftObjIndex];
+          var leftScale = LevelConfigs.CalcInitialScale(_currentLevel, true);
           var leftContainer = _refObjs[leftConfig.ObjName].Container;
-          configs.Add(new SlideAnimConfig {
+          animConfigs.Add(new SlideAnimConfig {
             Actor = leftContainer,
             FromPosition = leftConfig.InitialPosition,
             ToPosition = leftConfig.VanishingPosition,
@@ -308,12 +382,13 @@ namespace SeedCalc {
           objectToHideAfterAnim = null;
         }
 
-        var midConfig = LevelConfigs.Levels[_currentLevel].RefObjs[numCurrentObjs - 1];
-        var midScale = LevelConfigs.CalcInitialScale(_currentLevel, numCurrentObjs - 1);
-        var targetConfig = LevelConfigs.Levels[level].RefObjs[0];
-        var targetScale = LevelConfigs.CalcInitialScale(level, 0);
+        var midConfig =
+            currentLevelConfig.RightObjCandidates[_levelObjs[_currentLevel].rightObjIndex];
+        var midScale = LevelConfigs.CalcInitialScale(_currentLevel, false);
+        var targetConfig = targetLevelConfig.LeftObjCandidates[_levelObjs[level].leftObjIndex];
+        var targetScale = LevelConfigs.CalcInitialScale(level, true);
         var midContainer = _refObjs[midConfig.ObjName].Container;
-        configs.Add(new SlideAnimConfig {
+        animConfigs.Add(new SlideAnimConfig {
           Actor = midContainer,
           FromPosition = midConfig.InitialPosition,
           ToPosition = targetConfig.InitialPosition,
@@ -321,42 +396,23 @@ namespace SeedCalc {
           ToScale = targetScale,
         });
 
-        int numRightObjs = LevelConfigs.Levels[level].RefObjs.Length;
-        if (numRightObjs >= 2) {
-          var rightConfig = LevelConfigs.Levels[level].RefObjs[1];
-          var rightScale = LevelConfigs.CalcInitialScale(level, 1);
-          var rightContainer = _refObjs[rightConfig.ObjName].Container;
-          rightContainer.transform.localPosition = rightConfig.VanishingPosition;
-          rightContainer.transform.localScale = rightScale * 10.0f;
-          rightContainer.SetActive(true);
-          configs.Add(new SlideAnimConfig {
-            Actor = rightContainer,
-            FromPosition = rightContainer.transform.localPosition,
-            ToPosition = rightConfig.InitialPosition,
-            FromScale = rightContainer.transform.localScale,
-            ToScale = rightScale,
-          });
-        }
+        var rightConfig = targetLevelConfig.RightObjCandidates[_levelObjs[level].rightObjIndex];
+        var rightScale = LevelConfigs.CalcInitialScale(level, false);
+        var rightContainer = _refObjs[rightConfig.ObjName].Container;
+        rightContainer.transform.localPosition = rightConfig.VanishingPosition;
+        rightContainer.transform.localScale = rightScale * 10.0f;
+        rightContainer.SetActive(true);
+        animConfigs.Add(new SlideAnimConfig {
+          Actor = rightContainer,
+          FromPosition = rightContainer.transform.localPosition,
+          ToPosition = rightConfig.InitialPosition,
+          FromScale = rightContainer.transform.localScale,
+          ToScale = rightScale,
+        });
       } else {
         throw new System.ArgumentException();
       }
-      return configs;
-    }
-
-    private void ShowCurrentRefObjs(bool show) {
-      if (_currentLevel >= 0) {
-        LevelConfig config = LevelConfigs.Levels[_currentLevel];
-        foreach (var refObjConfig in config.RefObjs) {
-          var container = _refObjs[refObjConfig.ObjName].Container;
-          container.SetActive(show);
-        }
-      }
-    }
-
-    private void ShowCurrentDescPanels(bool show) {
-      if (_descPanels.TryGetValue(_currentLevel, out GameObject panel)) {
-        panel.SetActive(show);
-      }
+      return animConfigs;
     }
 
     private void ScrollRainbowTo(int navLevel) {

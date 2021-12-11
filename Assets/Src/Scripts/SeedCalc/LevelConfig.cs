@@ -13,27 +13,36 @@
 // limitations under the License.
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SeedCalc {
+  // Class to define a reference object in a level.
+  public class RefObjConfig {
+    // The name of the reference object.
+    //
+    // Every reference object must have an empty parent object as its container. The container
+    // object is used to position and scale the reference object. The name of the container must
+    // be named as `<ObjName>_Container`.
+    //
+    // The reference object itself owns the animations that can be triggered by controllers. It
+    // must also have a collider component so that it can receive users' click and touch events.
+    //
+    // A reference object may appear in more than one scale levels. In different scale levels, it
+    // may have different description boxes so that its description text can vary among levels. In
+    // the UI overlay, the scale level object and its child description box object are named as
+    // `Level_<LevelIndex>/<ObjName>_Desc`.
+    public string ObjName;
+    // The initial position of the object.
+    public Vector3 InitialPosition = new Vector3(0, 0, 0);
+    // The vanishing point when the object is sliding out of the board. The slide-out animation
+    // only happens when transitioning to a neighbor level. Thus, the left object always slides to
+    // its left side and the right object always slides to its right side.
+    public Vector3 VanishingPosition = new Vector3(0, 0, 0);
+  }
+
   // Class to define the reference objects, the animations and the scale of a single level.
   public class LevelConfig {
-    // Class to define a reference object in a level.
-    public class RefObjConfig {
-      // Every reference object must have an empty parent object as its container. The container
-      // object is used to position and scale the reference object.
-      public string ContainerName;
-      // The reference object itself owns the animations that can be triggered by controllers. It
-      // must also have a collider component so that it can receive users' click and touch events.
-      public string ObjName;
-      // The initial position of the object.
-      public Vector3 InitialPosition = new Vector3(0, 0, 0);
-      // The vanishing point when the object is sliding out of the board. The slide-out animation
-      // only happens when transitioning to a neighbor level. Thus, the left object always slides to
-      // its left side and the right object always slides to its right side.
-      public Vector3 VanishingPosition = new Vector3(0, 0, 0);
-    }
-
     // The recommended center point to position the left/smaller object.
     public const float LeftCenterX = -3.514f;
     public const float LeftCenterY = -3f;
@@ -50,10 +59,14 @@ namespace SeedCalc {
     public const float VanishingRightX = 40;
     public const float VanishingRightY = 0.43f;
 
-    // A typical level has two reference objects (the left/smaller object then the right/larger
-    // object), while the very end level (e.g., the 1e-10 level or the 1e+10 level) may have only
-    // one reference object.
-    public RefObjConfig[] RefObjs;
+    // A typical level shows two reference objects - the left/smaller object and the right/larger
+    // object. Each object can be randomly chosen from a list of candidates, defined with the
+    // following two arrays.
+    //
+    // The left end level (the 1e-10 level) may show only one reference object. In this case,
+    // LeftObjCandidates is set to null.
+    public RefObjConfig[] LeftObjCandidates;
+    public RefObjConfig[] RightObjCandidates;
 
     // The cutting board has a 4 rows by 6 columns grid, composed of 24 large square cells. Every
     // large cell has a 10 x 10 grid inside. ScalePerLargeUnit defines the side length (in meters)
@@ -77,6 +90,21 @@ namespace SeedCalc {
 
   // The global definitions of all the visualization levels.
   public static class LevelConfigs {
+    // Constructs the container name of a reference object.
+    public static string GetContainerName(string objName) {
+      return $"{objName}_Container";
+    }
+
+    // Constructs the parent object name of a level's description boxes.
+    public static string GetDescPanelName(int level) {
+      return $"Level_{level}";
+    }
+
+    // Constructs the description box name of a reference object.
+    public static string GetDescName(string objName) {
+      return $"{objName}_Desc";
+    }
+
     // Determines if a double value is visualizable based on the level configs.
     public static bool IsVisualizable(double value) {
       return LevelConfigs.MapNumberToLevel(value) >= 0;
@@ -105,28 +133,31 @@ namespace SeedCalc {
     }
 
     // Calculates the initial scale of the reference object.
-    public static Vector3 CalcInitialScale(int level, int objIndex) {
+    public static Vector3 CalcInitialScale(int level, bool isLeftObj) {
       Debug.Assert(level >= 0 && level < Levels.Count);
-      if (level == 0 || Levels[level].RefObjs.Length == 1 || objIndex > 0) {
-        // The larger object's initial scale is always 1. If there is only one reference object, it
-        // is the larger object and its initial scale is also 1.
-        return new Vector3(1, 1, 1);
-      } else {
-        // The smaller object's initial scale is calculated by considering both the grid scale of
-        // its left neighbor level and the grid scale of its own level.
-        Debug.Assert(level > 0);
-        float scale =
-            (float)(Levels[level - 1].ScalePerLargeUnit / Levels[level].ScalePerLargeUnit);
-        return new Vector3(scale, scale, scale);
-      }
+      // The left/smaller object's initial scale is calculated by considering both the grid scale of
+      // its left neighbor level and the grid scale of its own level. The right/larger object's
+      // initial scale is always 1.
+      float scale = isLeftObj ?
+          (float)(Levels[level - 1].ScalePerLargeUnit / Levels[level].ScalePerLargeUnit) : 1;
+      return new Vector3(scale, scale, scale);
+    }
+
+    // Returns an enumerable object that contains the reference object configs of both the left
+    // candidates and the right candidates.
+    public static IEnumerable<RefObjConfig> LeftAndRightCandidates(int level) {
+      Debug.Assert(level >= 0 && level < Levels.Count &&
+          !(Levels[level].RightObjCandidates is null));
+      return Levels[level].LeftObjCandidates is null ? Levels[level].RightObjCandidates :
+          Levels[level].LeftObjCandidates.Concat(Levels[level].RightObjCandidates);
     }
 
     public static readonly List<LevelConfig> Levels = new List<LevelConfig> {
       // 1E-10 only.
       new LevelConfig() {
-        RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "FluorineAtom_Container",
+        LeftObjCandidates = null,
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "FluorineAtom",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -2f),
             // No vanishing point for the left end level.
@@ -141,16 +172,16 @@ namespace SeedCalc {
 
       // 1E-10 and 1E-9.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "FluorineAtom_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "FluorineAtom",
             InitialPosition = new Vector3(-2.65f, -2.65f, -10f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.65f, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "DNA_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "DNA",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -166,16 +197,16 @@ namespace SeedCalc {
 
       // 1E-9 and 1E-8.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "DNA_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "DNA",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.7f, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Catalase_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Catalase",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -191,16 +222,16 @@ namespace SeedCalc {
 
       // 1E-8 and 1E-7.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Catalase_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Catalase",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "FluVirus_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "FluVirus",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -216,16 +247,16 @@ namespace SeedCalc {
 
       // 1E-7 and 1E-6.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "FluVirus_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "FluVirus",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "EColi_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "EColi",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -241,16 +272,16 @@ namespace SeedCalc {
 
       // 1E-6 and 1E-5.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "EColi_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "EColi",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "RedBloodCell_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "RedBloodCell",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -266,16 +297,16 @@ namespace SeedCalc {
 
       // 1E-5 and 1E-4.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "RedBloodCell_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "RedBloodCell",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "EggCell_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "EggCell",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -291,16 +322,16 @@ namespace SeedCalc {
 
       // 1E-4 and 1E-3.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "EggCell_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "EggCell",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "CabbageSeed_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "CabbageSeed",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -316,16 +347,16 @@ namespace SeedCalc {
 
       // 1E-3 and 1E-2.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "CabbageSeed_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "CabbageSeed",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Bee_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Bee",
             InitialPosition = new Vector3(.5f, LevelConfig.RightCenterY, -5f),
             VanishingPosition =
@@ -341,43 +372,79 @@ namespace SeedCalc {
 
       // 1E-2 and 1E-1.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Bee_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Bee",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Jellyfish_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Jellyfish",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
+          new RefObjConfig {
+            ObjName = "Cat",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
+          new RefObjConfig {
+            ObjName = "Rabbit",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
         },
-        ScalePerLargeUnit = .05,
+        ScalePerLargeUnit = .075,
         NavLevel = -2,
-        ScaleMarkerValueString = "0.01",
+        ScaleMarkerValueString = "0.025",
         MinVisualizableNumber = .01,
-        MaxVisualizableNumber = .1, // Max scale of this level is .2,
+        MaxVisualizableNumber = .1, // Max scale of this level is .3,
       },
 
       // 1E-1 and 1E0.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Jellyfish_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Jellyfish",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Penguin_Container",
+          new RefObjConfig {
+            ObjName = "Cat",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.5f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX, -2.5f, -.5f),
+          },
+          new RefObjConfig {
+            ObjName = "Rabbit",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.6f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX, -2.6f, -.5f),
+          },
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Penguin",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
+          new RefObjConfig {
+            ObjName = "Deer",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
+          new RefObjConfig {
+            ObjName = "Velociraptor",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
@@ -391,17 +458,41 @@ namespace SeedCalc {
 
       // 1E0 and 1E+1.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Penguin_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Penguin",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.2f, -.5f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
+                new Vector3(LevelConfig.VanishingLeftX, -3.2f, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Orca_Container",
+          new RefObjConfig {
+            ObjName = "Deer",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.2f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX,  -3.2f, -.5f),
+          },
+          new RefObjConfig {
+            ObjName = "Velociraptor",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.2f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX, -3.2f, -.5f),
+          },
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Orca",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
+          new RefObjConfig {
+            ObjName = "Giraffe",
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
+          },
+          new RefObjConfig {
+            ObjName = "Tyrannosaurus",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
@@ -416,16 +507,28 @@ namespace SeedCalc {
 
       // 1E+1 and 1E+2.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Orca_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Orca",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Redwood_Container",
+          new RefObjConfig {
+            ObjName = "Giraffe",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.2f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX, -3.2f, -.5f),
+          },
+          new RefObjConfig {
+            ObjName = "Tyrannosaurus",
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.2f, -.5f),
+            VanishingPosition =
+                new Vector3(LevelConfig.VanishingLeftX, -3.2f, -.5f),
+          },
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Redwood",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
             VanishingPosition =
@@ -441,16 +544,16 @@ namespace SeedCalc {
 
       // 1E+2 and 1E+3.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Redwood_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Redwood",
             InitialPosition = new Vector3(-4f, -3.35f, -7f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Mountain_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Mountain",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -2f),
             VanishingPosition =
@@ -466,16 +569,16 @@ namespace SeedCalc {
 
       // 1E+3 and 1E+4.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Mountain_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Mountain",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.85f, -25f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -3.7f, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Everest_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Everest",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, 0f),
             VanishingPosition =
@@ -491,16 +594,16 @@ namespace SeedCalc {
 
       // 1E+4 and 1E+5.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Everest_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Everest",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, -3.35f, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -3.35f, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Manicouagan_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Manicouagan",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -.5f),
             VanishingPosition =
@@ -516,16 +619,16 @@ namespace SeedCalc {
 
       // 1E+5 and 1E+6.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Manicouagan_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Manicouagan",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Ceres_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Ceres",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -541,16 +644,16 @@ namespace SeedCalc {
 
       // 1E+6 and 1E+7.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Ceres_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Ceres",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Earth_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Earth",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -566,16 +669,16 @@ namespace SeedCalc {
 
       // 1E+7 and 1E+8.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Earth_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Earth",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.5f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Jupiter_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Jupiter",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
@@ -591,16 +694,16 @@ namespace SeedCalc {
 
       // 1E+8 and 1E+9.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Jupiter_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Jupiter",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -10f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Sun_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Sun",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
             VanishingPosition =
@@ -616,16 +719,16 @@ namespace SeedCalc {
 
       // 1E+9 and 1E+10.
       new LevelConfig() {
-         RefObjs = new LevelConfig.RefObjConfig[] {
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Sun_Container",
+        LeftObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Sun",
             InitialPosition = new Vector3(LevelConfig.LeftCenterX, LevelConfig.LeftCenterY, -.2f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, LevelConfig.VanishingLeftY, -.5f),
           },
-          new LevelConfig.RefObjConfig {
-            ContainerName = "Blackhole_Container",
+        },
+        RightObjCandidates = new RefObjConfig[] {
+          new RefObjConfig {
             ObjName = "Blackhole",
             InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
