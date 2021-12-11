@@ -340,7 +340,6 @@ namespace SeedCalc {
       var syntaxTokens = ParseExpression(out string expression);
       if (syntaxTokens is null) {
         ParsedExpression = null;
-        return;
       } else {
         ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, false);
       }

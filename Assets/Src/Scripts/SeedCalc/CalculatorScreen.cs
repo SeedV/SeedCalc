@@ -74,11 +74,13 @@ namespace SeedCalc {
     public void OnCalculatorParsedExpressionUpdated(object sender, UpdatedEvent.Args args) {
       if (args.Value is null) {
         PrintToTop(_initialText);
+        PrintToBottom(_initialText);
         return;
       }
       var parsedExpression = args.Value as ParsedExpression;
       if (parsedExpression.SyntaxTokens.Count <= 0) {
         PrintToTop(_initialText);
+        PrintToBottom(_initialText);
         return;
       }
       var textBuffer = new StringBuilder();
@@ -120,9 +122,12 @@ namespace SeedCalc {
         textBuffer.Append($"<color={color}>{tokenText}</color>");
       }
       PrintToTop(textBuffer.ToString());
-      if (!parsedExpression.BeingCalculated &&
-          parsedExpression.TryParseLastTokenToNumber(out double lastNumber)) {
-        PrintToBottom(NumberFormatter.Format((double)lastNumber));
+      if (!parsedExpression.BeingCalculated) {
+        if (parsedExpression.TryParseLastTokenToNumber(out double lastNumber)) {
+          PrintToBottom(NumberFormatter.Format((double)lastNumber));
+        } else {
+          PrintToBottom(null);
+        }
       }
     }
 
