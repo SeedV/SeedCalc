@@ -212,7 +212,6 @@ namespace SeedCalc {
     private void SetupRefObjs() {
       _refObjs.Clear();
       for (int level = 0; level < LevelConfigs.Levels.Count; level++) {
-        var config = LevelConfigs.Levels[level];
         PreloadCandidateObjs(level);
         ChooseRefObjsRandomly();
       }
