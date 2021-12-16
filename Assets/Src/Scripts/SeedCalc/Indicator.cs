@@ -23,26 +23,54 @@ namespace SeedCalc {
     private const float _canvasHeight = 2048f;
     private const float _indicatorValueOriginY = -210f;
     private const float _indicatorUnitSize = 45f;
+    private const string _wireLightAnimOnTrigger = "Active";
+    private const string _wireLightAnimOffTrigger = "Inactive";
+    private const float _delayAfterWireLightAnim = 0f;
+    private const float _growAnimDelta = 0.03f;
 
-    private bool _visible;
+    private bool _visible = false;
 
+    public GameObject WireLightSprite;
     public TextMeshProUGUI IndicatorValue;
 
     public void SetValue(double maxValueOfCurrentLevel, double value) {
       Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
-      if (LevelConfigs.IsVisualizable(value)) {
-        IndicatorValue.text = NumberFormatter.Format(value);
-        float percentage = (float)(value / maxValueOfCurrentLevel);
-        transform.localScale = new Vector3(1f, percentage, 1f);
-        // Hides the indicator value until it's correctly positioned in the next frame.
-        var indicatorValueRect = IndicatorValue.GetComponent<RectTransform>();
-        float indicatorValueX = indicatorValueRect.anchoredPosition.x;
-        indicatorValueRect.anchoredPosition = new Vector2(indicatorValueX, -_canvasHeight);
-        // The indicator value's UI element uses ContentFilterSize to auto-adjust its size. When the
-        // text content is set, the rect size will not be updated until the next frame. Thus we have
-        // to wait for the next frame to calculate and set the position of the indicator value.
-        StartCoroutine(PositionIndicatorValueInNextFrame(percentage, indicatorValueRect));
+      IndicatorValue.text = NumberFormatter.Format(value);
+      float percentage = GetPercentage(maxValueOfCurrentLevel, value);
+      transform.localScale = new Vector3(1f, percentage, 1f);
+      HideIndicatorValue();
+      Visible = true;
+      // The indicator value's UI element uses ContentFilterSize to auto-adjust its size. When the
+      // text content is set, the rect size will not be updated until the next frame. Thus we have
+      // to wait for the next frame to calculate and set the position of the indicator value.
+      StartCoroutine(PositionIndicatorValueInNextFrameCoroutine(percentage));
+    }
+
+    public IEnumerator SetValueWithAnim(double maxValueOfCurrentLevel, double value) {
+      Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
+      IndicatorValue.text = NumberFormatter.Format(value);
+      float percentage = GetPercentage(maxValueOfCurrentLevel, value);
+      Visible = false;
+      // If there is still a previous anim being played, this yield line will break it.
+      yield return null;
+      HideIndicatorValue();
+      Visible = true;
+      transform.localScale = new Vector3(1f, 0f, 1f);
+      WireLightSprite.GetComponent<Animator>().SetTrigger(_wireLightAnimOnTrigger);
+      yield return new WaitForSeconds(_delayAfterWireLightAnim);
+      for (float scale = 0f; scale < percentage; scale += _growAnimDelta) {
+        transform.localScale = new Vector3(1f, scale, 1f);
+        if (!_visible) {
+          // Stops the animation immediately if the indicator is turned off by the outter loop.
+          WireLightSprite.GetComponent<Animator>().SetTrigger(_wireLightAnimOffTrigger);
+          yield break;
+        }
+        yield return null;
       }
+      transform.localScale = new Vector3(1f, percentage, 1f);
+      WireLightSprite.GetComponent<Animator>().SetTrigger(_wireLightAnimOffTrigger);
+      yield return null;
+      PositionIndicatorValueInNextFrame(percentage);
     }
 
     public bool Visible {
@@ -54,13 +82,23 @@ namespace SeedCalc {
       }
     }
 
-    void Start() {
+    private float GetPercentage(double maxValueOfCurrentLevel, double value) {
+      return (float)(value / maxValueOfCurrentLevel);
     }
 
-    private IEnumerator PositionIndicatorValueInNextFrame(
-        float percentage, RectTransform indicatorValueRect) {
-      // Waits for the next frame.
+    private void HideIndicatorValue() {
+      var indicatorValueRect = IndicatorValue.GetComponent<RectTransform>();
+      float indicatorValueX = indicatorValueRect.anchoredPosition.x;
+      indicatorValueRect.anchoredPosition = new Vector2(indicatorValueX, -_canvasHeight);
+    }
+
+    private IEnumerator PositionIndicatorValueInNextFrameCoroutine(float percentage) {
       yield return new WaitForEndOfFrame();
+      PositionIndicatorValueInNextFrame(percentage);
+    }
+
+    private void PositionIndicatorValueInNextFrame(float percentage) {
+      var indicatorValueRect = IndicatorValue.GetComponent<RectTransform>();
       float indicatorHeight = _fullHeight * percentage;
       float indicatorValueWidth = indicatorValueRect.sizeDelta.x;
       float indicatorValueX = indicatorValueRect.anchoredPosition.x;

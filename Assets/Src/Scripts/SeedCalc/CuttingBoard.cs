@@ -161,9 +161,11 @@ namespace SeedCalc {
             if (!_active) {
               SetActive(true);
             }
-            // Hides indicator and desc panels during the transition.
-            Indicator.Visible = false;
+            // Hides desc panels during the transition.
             ShowDescBoxesAtLevel(_currentLevel, false);
+            // Plays a separate animation to grow the indicator and show the indicator value.
+            double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
+            StartCoroutine(Indicator.SetValueWithAnim(indicatorMax, number));
             if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
               // Slides to the left/right neighbor level.
               var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
@@ -194,9 +196,6 @@ namespace SeedCalc {
             Nav.SetNavLevel(LevelConfigs.Levels[level].NavLevel,
                             LevelConfigs.Levels[level].ScaleMarkerValueString);
             ScrollRainbowTo(LevelConfigs.Levels[level].NavLevel);
-            Indicator.Visible = true;
-            double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
-            Indicator.SetValue(indicatorMax, number);
             ShowDescBoxesAtLevel(_currentLevel, true);
           } else {
             // When a number is not able to be visualized, we do not turn the whole board to its
