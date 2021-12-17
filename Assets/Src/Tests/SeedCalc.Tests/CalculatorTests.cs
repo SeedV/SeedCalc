@@ -251,7 +251,7 @@ namespace SeedCalc.Tests {
     [Test]
     public void TestInputOverflow() {
       var calculator = new Calculator(CalculationMode.CalculateImmediately, null);
-      for (int i = 0; i < 50; i++) {
+      for (int i = 0; i < 40; i++) {
         calculator.OnInput("9");
       }
       Assert.True(calculator.State.IsOk());
