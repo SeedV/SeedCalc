@@ -37,6 +37,10 @@ namespace SeedCalc {
         new Dictionary<string, string> {
       { "*", "\u00D7" },
       { "/", "\u00F7" },
+      // Replaces the hyphen-minus sign U+002D with the minus sign U+2212, so that the minus sign in
+      // the expression won't be treated as a hyphen when Unity wraps the top line text. Please
+      // double check that the font used for screen texts does support the character U+2212,
+      { "-", "\u2212" },
     };
 
     private TextMeshProUGUI _topLine;

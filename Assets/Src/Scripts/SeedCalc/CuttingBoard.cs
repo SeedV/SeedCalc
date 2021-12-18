@@ -161,9 +161,11 @@ namespace SeedCalc {
             if (!_active) {
               SetActive(true);
             }
-            // Hides indicator and desc panels during the transition.
-            Indicator.Visible = false;
+            // Hides desc panels during the transition.
             ShowDescBoxesAtLevel(_currentLevel, false);
+            // Plays a separate animation to grow the indicator and show the indicator value.
+            double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
+            StartCoroutine(Indicator.SetValueWithAnim(indicatorMax, number));
             if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
               // Slides to the left/right neighbor level.
               var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
@@ -194,9 +196,6 @@ namespace SeedCalc {
             Nav.SetNavLevel(LevelConfigs.Levels[level].NavLevel,
                             LevelConfigs.Levels[level].ScaleMarkerValueString);
             ScrollRainbowTo(LevelConfigs.Levels[level].NavLevel);
-            Indicator.Visible = true;
-            double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
-            Indicator.SetValue(indicatorMax, number);
             ShowDescBoxesAtLevel(_currentLevel, true);
           } else {
             // When a number is not able to be visualized, we do not turn the whole board to its
@@ -416,9 +415,13 @@ namespace SeedCalc {
 
     private void ScrollRainbowTo(int navLevel) {
       Debug.Assert(navLevel >= Nav.MinLevel && navLevel <= Nav.MaxLevel);
-      int intervals = Nav.MaxLevel - Nav.MinLevel;
+      // The rainbow texture image has a left-end and a right-end, which can be used to render a
+      // background corresponding to a number that is either out-of-lower-bound or
+      // out-of-upper-bound. Hence the number 2 is added to the interval count so that the left-end
+      // and the right-end can be excluded when rendering background for normal levels.
+      int intervals = Nav.MaxLevel - Nav.MinLevel + 2;
       float texOffsetX = (1.0f - _rainbowTexInitOffsetX) /
-          intervals * (navLevel - Nav.MinLevel) + _rainbowTexInitOffsetX;
+          intervals * (navLevel - Nav.MinLevel + 1) + _rainbowTexInitOffsetX;
       if (texOffsetX > 1.0f) {
         texOffsetX -= 1.0f;
       }

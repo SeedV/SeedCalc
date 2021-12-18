@@ -120,7 +120,7 @@ namespace SeedCalc {
     }
 
     // TODO: Adjust this limit when the screen size / font design is updated.
-    private const int _maxChars = 50;
+    private const int _maxChars = 40;
     private const string _moduleName = "SeedCalc";
     private const int _calcAnimBlinkTimes = 3;
     private const float _calcAnimBlinkInterval = 0.1f;
@@ -438,6 +438,14 @@ namespace SeedCalc {
           yield return new WaitForSeconds(_calcAnimInterval);
         }
       }
+      // UpdateExpressionWithStepResult reformats intermediate results so that the calculation of
+      // each step might accumulate precision errors. Thus for the final step, the expression must
+      // be reset back to the original final result.
+      expression = NumberFormatter.Format(finalResult);
+      syntaxTokens = Executor.ParseSyntaxTokens(expression,
+                                                _moduleName,
+                                                SeedXLanguage.SeedCalc,
+                                                null);
       ParsedExpression = new ParsedExpression(expression, syntaxTokens, null, false);
       // Updates the input buffer since the expression could change during the calculation steps.
       _cachedExpression.Clear();
