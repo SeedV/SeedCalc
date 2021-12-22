@@ -40,6 +40,9 @@ namespace SeedCalc {
 
     public void Show(bool visible) {
       gameObject.SetActive(visible);
+      if (visible) {
+        LocalizationUtils.UpdateLocalizedAssets(gameObject, true);
+      }
     }
   }
 }

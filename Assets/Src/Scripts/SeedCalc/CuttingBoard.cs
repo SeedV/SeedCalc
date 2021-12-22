@@ -33,7 +33,7 @@ namespace SeedCalc {
 
     // The active and inactive colors for the CuttingBoard material.
     private static readonly Color _activeColor = new Color(.6f, .6f, .6f);
-    private static readonly Color _inactiveColor = new Color(.14f, .27f, .26f);
+    private static readonly Color _inactiveColor = new Color(.5f, .5f, .5f);
     // The initial x offset of the rainbow texture.
     private const float _rainbowTexInitOffsetX = 0.05f;
     // The numbers of large rows and columns of the grid.
@@ -49,6 +49,7 @@ namespace SeedCalc {
     public GameObject RootOfRefObjs;
     public GameObject RootOfDescPanels;
     public Texture RainbowTexture;
+    public Texture InactiveTexture;
     public GameObject LightingMask;
     public Nav Nav;
     public Indicator Indicator;
@@ -132,7 +133,7 @@ namespace SeedCalc {
 
     // Turns the cutting board on/off.
     private void SetActive(bool active) {
-      GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : null;
+      GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : InactiveTexture;
       GetComponent<Renderer>().material.color =  active ? _activeColor : _inactiveColor;
       LightingMask.SetActive(active);
       Nav.Show(active);
@@ -303,12 +304,18 @@ namespace SeedCalc {
           string leftObjName = config.LeftObjCandidates[_levelObjs[level].leftObjIndex].ObjName;
           if (_descBoxes.TryGetValue((level, leftObjName), out var leftDescBox)) {
             leftDescBox.SetActive(show);
+            if (show) {
+              LocalizationUtils.UpdateLocalizedAssets(leftDescBox, true);
+            }
           }
         }
         Debug.Assert(_levelObjs[level].rightObjIndex >= 0);
         string rightObjName = config.RightObjCandidates[_levelObjs[level].rightObjIndex].ObjName;
         if (_descBoxes.TryGetValue((level, rightObjName), out var rightDescBox)) {
           rightDescBox.SetActive(show);
+          if (show) {
+            LocalizationUtils.UpdateLocalizedAssets(rightDescBox, true);
+          }
         }
       }
     }
