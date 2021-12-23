@@ -35,21 +35,24 @@ namespace SeedCalc {
 
     public void OnClickButton(string input) {
       if (_calculator.AcceptingInput) {
-        GetComponent<AudioSource>().Play();
+        PlayClickSound();
         _calculator.OnInput(input);
       }
     }
 
     public void OnOpenAbout() {
+      PlayClickSound();
       AboutDialog.SetActive(true);
       LocalizationUtils.UpdateLocalizedAssets(AboutDialog.gameObject, true);
     }
 
     public void OnCloseAbout() {
+      PlayClickSound();
       AboutDialog.SetActive(false);
     }
 
     public void OnOpenSettings() {
+      PlayClickSound();
       SettingsDialog.SetActive(true);
       LocalizationUtils.UpdateLocalizedAssets(SettingsDialog.gameObject, true);
       string langCode = LocalizationUtils.GetCurrentLocale();
@@ -66,10 +69,12 @@ namespace SeedCalc {
     }
 
     public void OnCloseSettings() {
+      PlayClickSound();
       SettingsDialog.SetActive(false);
     }
 
     public void OnSetChinese() {
+      PlayClickSound();
       if (LocalizationUtils.SetLocale(LocalizationUtils.ChineseLangCode)) {
         SetButtonState(_chineseButton, true);
         SetButtonState(_englishButton, false);
@@ -77,6 +82,7 @@ namespace SeedCalc {
     }
 
     public void OnSetEnglish() {
+      PlayClickSound();
       if (LocalizationUtils.SetLocale(LocalizationUtils.EnglishLangCode)) {
         SetButtonState(_chineseButton, false);
         SetButtonState(_englishButton, true);
@@ -87,7 +93,7 @@ namespace SeedCalc {
       AudioListener.volume = AudioListener.volume > 0.0f ? 0.0f : 1.0f;
       SetSoundSwitchState();
       if (AudioListener.volume > 0.0f) {
-        GetComponent<AudioSource>().Play();
+        PlayClickSound();
       }
     }
 
@@ -139,6 +145,10 @@ namespace SeedCalc {
         _soundOffText.SetActive(true);
         LocalizationUtils.UpdateLocalizedAssets(_soundOffText);
       }
+    }
+
+    private void PlayClickSound() {
+      GetComponent<AudioSource>().Play();
     }
   }
 }
