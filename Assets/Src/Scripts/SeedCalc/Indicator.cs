@@ -26,7 +26,6 @@ namespace SeedCalc {
     private const string _wireLightAnimOnTrigger = "Active";
     private const string _wireLightAnimOffTrigger = "Inactive";
     private const float _delayAfterWireLightAnim = 0f;
-    private const float _growAnimDelta = 0.03f;
 
     private bool _visible = false;
 
@@ -58,7 +57,13 @@ namespace SeedCalc {
       transform.localScale = new Vector3(1f, 0f, 1f);
       WireLightSprite.GetComponent<Animator>().SetTrigger(_wireLightAnimOnTrigger);
       yield return new WaitForSeconds(_delayAfterWireLightAnim);
-      for (float scale = 0f; scale < percentage; scale += _growAnimDelta) {
+      float velocity = 0;
+      float scale = 0;
+      while (!MathUtils.EqualsApproximately(scale, percentage, 0.005f)) {
+        // The indicator's animation uses the same TransitionSmoothTime as the cutting board's scale
+        // transition animation.
+        scale =
+            Mathf.SmoothDamp(scale, percentage, ref velocity, CuttingBoard.TransitionSmoothTime);
         transform.localScale = new Vector3(1f, scale, 1f);
         if (!_visible) {
           // Stops the animation immediately if the indicator is turned off by the outter loop.
