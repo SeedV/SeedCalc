@@ -56,6 +56,14 @@ namespace SeedCalc {
       }
     }
 
+    // Sets a game object's active state, and updates its localized assets if it is set to active.
+    public static void SetActiveAndUpdate(GameObject gameObject, bool show) {
+      gameObject.SetActive(show);
+      if (show) {
+        UpdateLocalizedAssets(gameObject, true);
+      }
+    }
+
     private static void SaveLocale(string langCode) {
       Debug.Assert(!string.IsNullOrEmpty(langCode));
       PlayerPrefs.SetString(_userPrefKeySelectedLocale, langCode);

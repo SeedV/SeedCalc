@@ -81,11 +81,8 @@ namespace SeedCalc {
     public bool Visible {
       get => _visible;
       set {
-        IndicatorValue.gameObject.SetActive(value);
+        LocalizationUtils.SetActiveAndUpdate(IndicatorValue.gameObject, value);
         gameObject.gameObject.SetActive(value);
-        if (value) {
-          LocalizationUtils.UpdateLocalizedAssets(IndicatorValue.gameObject, true);
-        }
         _visible = value;
       }
     }

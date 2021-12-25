@@ -320,19 +320,13 @@ namespace SeedCalc {
         if (_levelObjs[level].leftObjIndex >= 0) {
           string leftObjName = config.LeftObjCandidates[_levelObjs[level].leftObjIndex].ObjName;
           if (_descBoxes.TryGetValue((level, leftObjName), out var leftDescBox)) {
-            leftDescBox.SetActive(show);
-            if (show) {
-              LocalizationUtils.UpdateLocalizedAssets(leftDescBox, true);
-            }
+            LocalizationUtils.SetActiveAndUpdate(leftDescBox, show);
           }
         }
         Debug.Assert(_levelObjs[level].rightObjIndex >= 0);
         string rightObjName = config.RightObjCandidates[_levelObjs[level].rightObjIndex].ObjName;
         if (_descBoxes.TryGetValue((level, rightObjName), out var rightDescBox)) {
-          rightDescBox.SetActive(show);
-          if (show) {
-            LocalizationUtils.UpdateLocalizedAssets(rightDescBox, true);
-          }
+          LocalizationUtils.SetActiveAndUpdate(rightDescBox, show);
         }
       }
     }

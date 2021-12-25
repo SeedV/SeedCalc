@@ -42,8 +42,7 @@ namespace SeedCalc {
 
     public void OnOpenAbout() {
       PlayClickSound();
-      AboutDialog.SetActive(true);
-      LocalizationUtils.UpdateLocalizedAssets(AboutDialog.gameObject, true);
+      LocalizationUtils.SetActiveAndUpdate(AboutDialog, true);
     }
 
     public void OnCloseAbout() {
@@ -53,8 +52,7 @@ namespace SeedCalc {
 
     public void OnOpenSettings() {
       PlayClickSound();
-      SettingsDialog.SetActive(true);
-      LocalizationUtils.UpdateLocalizedAssets(SettingsDialog.gameObject, true);
+      LocalizationUtils.SetActiveAndUpdate(SettingsDialog, true);
       string langCode = LocalizationUtils.GetCurrentLocale();
       if (langCode == LocalizationUtils.ChineseLangCode) {
         SetButtonState(_chineseButton, true);
@@ -137,13 +135,11 @@ namespace SeedCalc {
     private void SetSoundSwitchState() {
       SetButtonState(_soundSwitchButton, AudioListener.volume > 0.0f);
       if (AudioListener.volume > 0.0f) {
-        _soundOnText.SetActive(true);
-        LocalizationUtils.UpdateLocalizedAssets(_soundOnText);
+        LocalizationUtils.SetActiveAndUpdate(_soundOnText, true);
         _soundOffText.SetActive(false);
       } else {
         _soundOnText.SetActive(false);
-        _soundOffText.SetActive(true);
-        LocalizationUtils.UpdateLocalizedAssets(_soundOffText);
+        LocalizationUtils.SetActiveAndUpdate(_soundOffText, true);
       }
     }
 
