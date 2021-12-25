@@ -14,20 +14,84 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 using AgileMvvm;
 
 namespace SeedCalc {
   public class GameManager : MonoBehaviour {
-    private Calculator _calculator = null;
-
-    // The UI component of the calculator screen must be associated to this field in Unity.
     public CalculatorScreen Screen;
     public CuttingBoard CuttingBoard;
+    public GameObject SettingsDialog;
+    public GameObject AboutDialog;
+    public Sprite ActiveButtonSprite;
+    public Sprite InactiveButtonSprite;
+
+    private Calculator _calculator = null;
+    private Button _chineseButton = null;
+    private Button _englishButton = null;
+    private Button _soundSwitchButton = null;
+    private GameObject _soundOnText = null;
+    private GameObject _soundOffText = null;
 
     public void OnClickButton(string input) {
       if (_calculator.AcceptingInput) {
-        GetComponent<AudioSource>().Play();
+        PlayClickSound();
         _calculator.OnInput(input);
+      }
+    }
+
+    public void OnOpenAbout() {
+      PlayClickSound();
+      LocalizationUtils.SetActiveAndUpdate(AboutDialog, true);
+    }
+
+    public void OnCloseAbout() {
+      PlayClickSound();
+      AboutDialog.SetActive(false);
+    }
+
+    public void OnOpenSettings() {
+      PlayClickSound();
+      LocalizationUtils.SetActiveAndUpdate(SettingsDialog, true);
+      string langCode = LocalizationUtils.GetCurrentLocale();
+      if (langCode == LocalizationUtils.ChineseLangCode) {
+        SetButtonState(_chineseButton, true);
+        SetButtonState(_englishButton, false);
+      } else if (langCode == LocalizationUtils.EnglishLangCode) {
+        SetButtonState(_chineseButton, false);
+        SetButtonState(_englishButton, true);
+      } else {
+        Debug.Assert(false, $"{LocalizationUtils.GetCurrentLocale()}");
+      }
+      SetSoundSwitchState();
+    }
+
+    public void OnCloseSettings() {
+      PlayClickSound();
+      SettingsDialog.SetActive(false);
+    }
+
+    public void OnSetChinese() {
+      PlayClickSound();
+      if (LocalizationUtils.SetLocale(LocalizationUtils.ChineseLangCode)) {
+        SetButtonState(_chineseButton, true);
+        SetButtonState(_englishButton, false);
+      }
+    }
+
+    public void OnSetEnglish() {
+      PlayClickSound();
+      if (LocalizationUtils.SetLocale(LocalizationUtils.EnglishLangCode)) {
+        SetButtonState(_chineseButton, false);
+        SetButtonState(_englishButton, true);
+      }
+    }
+
+    public void OnSoundSwitch() {
+      AudioListener.volume = AudioListener.volume > 0.0f ? 0.0f : 1.0f;
+      SetSoundSwitchState();
+      if (AudioListener.volume > 0.0f) {
+        PlayClickSound();
       }
     }
 
@@ -49,6 +113,38 @@ namespace SeedCalc {
       _calculator.Bind(
           nameof(_calculator.Result),
           new EventHandler<UpdatedEvent.Args>(CuttingBoard.OnCalculatorResultUpdated));
+
+      var bk = SettingsDialog.transform.Find("Background");
+      Debug.Assert(!(bk is null));
+      _chineseButton = bk.Find("ButtonChinese")?.GetComponent<Button>();
+      Debug.Assert(!(_chineseButton is null));
+      _englishButton = bk.Find("ButtonEnglish")?.GetComponent<Button>();
+      Debug.Assert(!(_englishButton is null));
+      _soundSwitchButton = bk.Find("ButtonSoundSwitch")?.GetComponent<Button>();
+      Debug.Assert(!(_soundSwitchButton is null));
+      _soundOnText = _soundSwitchButton.transform.Find("SoundOnText")?.gameObject;
+      Debug.Assert(!(_soundOnText is null));
+      _soundOffText = _soundSwitchButton.transform.Find("SoundOffText")?.gameObject;
+      Debug.Assert(!(_soundOffText is null));
+    }
+
+    private void SetButtonState(Button button, bool active) {
+      button.GetComponent<Image>().sprite = active ? ActiveButtonSprite : InactiveButtonSprite;
+    }
+
+    private void SetSoundSwitchState() {
+      SetButtonState(_soundSwitchButton, AudioListener.volume > 0.0f);
+      if (AudioListener.volume > 0.0f) {
+        LocalizationUtils.SetActiveAndUpdate(_soundOnText, true);
+        _soundOffText.SetActive(false);
+      } else {
+        _soundOnText.SetActive(false);
+        LocalizationUtils.SetActiveAndUpdate(_soundOffText, true);
+      }
+    }
+
+    private void PlayClickSound() {
+      GetComponent<AudioSource>().Play();
     }
   }
 }

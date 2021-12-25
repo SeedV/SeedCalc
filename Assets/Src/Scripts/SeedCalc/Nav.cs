@@ -39,7 +39,7 @@ namespace SeedCalc {
     }
 
     public void Show(bool visible) {
-      gameObject.SetActive(visible);
+      LocalizationUtils.SetActiveAndUpdate(gameObject, visible);
     }
   }
 }

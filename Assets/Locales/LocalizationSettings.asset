@@ -16,44 +16,40 @@ MonoBehaviour:
   - id: 0
   - id: 1
   - id: 2
-  - id: 3
   m_AvailableLocales:
-    id: 4
+    id: 3
   m_AssetDatabase:
-    id: 5
+    id: 4
   m_StringDatabase:
-    id: 6
+    id: 5
   m_Metadata:
-    m_Items: []
+    m_Items:
+    - id: 6
   m_ProjectLocaleIdentifier:
     m_Code: en-US
-  m_InitializeSynchronously: 0
+  m_InitializeSynchronously: 1
   references:
     version: 1
     00000000:
-      type: {class: CommandLineLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
-      data:
-        m_CommandLineArgument: -language =
-    00000001:
       type: {class: PlayerPrefLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
         m_PlayerPreferenceKey: selected-locale
-    00000002:
+    00000001:
       type: {class: SystemLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
-    00000003:
+    00000002:
       type: {class: SpecificLocaleSelector, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
         m_LocaleId:
           m_Code: en-US
-    00000004:
+    00000003:
       type: {class: LocalesProvider, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
-    00000005:
+    00000004:
       type: {class: LocalizedAssetDatabase, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
         m_DefaultTableReference:
           m_TableCollectionName: 
         m_UseFallback: 0
-    00000006:
+    00000005:
       type: {class: LocalizedStringDatabase, ns: UnityEngine.Localization.Settings, asm: Unity.Localization}
       data:
         m_DefaultTableReference:
@@ -63,6 +59,54 @@ MonoBehaviour:
         m_NoTranslationFoundMessage: No translation found for '{key}' in {table.TableCollectionName}
         m_SmartFormat:
           id: 7
+    00000006:
+      type: {class: AppInfo, ns: UnityEngine.Localization.Platform.iOS, asm: Unity.Localization}
+      data:
+        m_ShortName:
+          m_TableReference:
+            m_TableCollectionName: GUID:cefb883c8a2724890a49b69c6e47cd8e
+          m_TableEntryReference:
+            m_KeyId: 8682527312044032
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_DisplayName:
+          m_TableReference:
+            m_TableCollectionName: 
+          m_TableEntryReference:
+            m_KeyId: 0
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_CameraUsageDescription:
+          m_TableReference:
+            m_TableCollectionName: 
+          m_TableEntryReference:
+            m_KeyId: 0
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_MicrophoneUsageDescription:
+          m_TableReference:
+            m_TableCollectionName: 
+          m_TableEntryReference:
+            m_KeyId: 0
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
+        m_LocationUsageDescription:
+          m_TableReference:
+            m_TableCollectionName: 
+          m_TableEntryReference:
+            m_KeyId: 0
+            m_Key: 
+          m_FallbackState: 0
+          m_WaitForCompletion: 0
+          m_LocalVariables: []
     00000007:
       type: {class: SmartFormatter, ns: UnityEngine.Localization.SmartFormat, asm: Unity.Localization}
       data:

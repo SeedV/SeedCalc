@@ -29,11 +29,16 @@ namespace SeedCalc {
       public Vector3 ToPosition;
       public Vector3 FromScale;
       public Vector3 ToScale;
+      public Vector3 PositionVelocity;
+      public Vector3 ScaleVelocity;
     }
+
+    // The approximately smooth damping animation time when transitioning to the neighbor level.
+    public const float TransitionSmoothTime = 0.25f;
 
     // The active and inactive colors for the CuttingBoard material.
     private static readonly Color _activeColor = new Color(.6f, .6f, .6f);
-    private static readonly Color _inactiveColor = new Color(.14f, .27f, .26f);
+    private static readonly Color _inactiveColor = new Color(.5f, .5f, .5f);
     // The initial x offset of the rainbow texture.
     private const float _rainbowTexInitOffsetX = 0.05f;
     // The numbers of large rows and columns of the grid.
@@ -41,14 +46,13 @@ namespace SeedCalc {
     private const int _LargeCellCols = 6;
     // The trigger name to play the active animation when user clicks or touches on the object.
     private const string _activeAnimTriggerName = "Active";
-    // The nubmer of animation steps (frames) when transitioning to the neighbor level.
-    private const int _transitionAnimSteps = 20;
     // A number that is not visualizable so that it can be queued to turn off the indicator.
     private const int _nonVisualizableNumber = -1;
 
     public GameObject RootOfRefObjs;
     public GameObject RootOfDescPanels;
     public Texture RainbowTexture;
+    public Texture InactiveTexture;
     public GameObject LightingMask;
     public Nav Nav;
     public Indicator Indicator;
@@ -132,7 +136,7 @@ namespace SeedCalc {
 
     // Turns the cutting board on/off.
     private void SetActive(bool active) {
-      GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : null;
+      GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : InactiveTexture;
       GetComponent<Renderer>().material.color =  active ? _activeColor : _inactiveColor;
       LightingMask.SetActive(active);
       Nav.Show(active);
@@ -169,17 +173,31 @@ namespace SeedCalc {
             if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
               // Slides to the left/right neighbor level.
               var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
-              for (int i = 1; i <= _transitionAnimSteps; i++) {
-                // Adjusts positions and scales one step per frame.
+              Debug.Assert(animConfigs.Count > 0);
+              foreach (var animConfig in animConfigs) {
+                animConfig.PositionVelocity = Vector3.zero;
+                animConfig.ScaleVelocity = Vector3.zero;
+              }
+              while (!MathUtils.EqualsApproximately(animConfigs[0].Actor.transform.localPosition,
+                                                    animConfigs[0].ToPosition,
+                                                    0.005f)) {
                 foreach (var animConfig in animConfigs) {
                   animConfig.Actor.transform.localPosition =
-                      Vector3.Lerp(animConfig.FromPosition, animConfig.ToPosition,
-                                   (float)i / (float)_transitionAnimSteps);
+                      Vector3.SmoothDamp(animConfig.Actor.transform.localPosition,
+                                         animConfig.ToPosition,
+                                         ref animConfig.PositionVelocity,
+                                         TransitionSmoothTime);
                   animConfig.Actor.transform.localScale =
-                      Vector3.Lerp(animConfig.FromScale, animConfig.ToScale,
-                                   (float)i / (float)_transitionAnimSteps);
+                      Vector3.SmoothDamp(animConfig.Actor.transform.localScale,
+                                         animConfig.ToScale,
+                                         ref animConfig.ScaleVelocity,
+                                         TransitionSmoothTime);
                 }
                 yield return null;
+              }
+              foreach (var animConfig in animConfigs) {
+                animConfig.Actor.transform.localPosition = animConfig.ToPosition;
+                animConfig.Actor.transform.localScale = animConfig.ToScale;
               }
               if (!(objectToHideAfterAnim is null)) {
                 objectToHideAfterAnim.SetActive(false);
@@ -302,13 +320,13 @@ namespace SeedCalc {
         if (_levelObjs[level].leftObjIndex >= 0) {
           string leftObjName = config.LeftObjCandidates[_levelObjs[level].leftObjIndex].ObjName;
           if (_descBoxes.TryGetValue((level, leftObjName), out var leftDescBox)) {
-            leftDescBox.SetActive(show);
+            LocalizationUtils.SetActiveAndUpdate(leftDescBox, show);
           }
         }
         Debug.Assert(_levelObjs[level].rightObjIndex >= 0);
         string rightObjName = config.RightObjCandidates[_levelObjs[level].rightObjIndex].ObjName;
         if (_descBoxes.TryGetValue((level, rightObjName), out var rightDescBox)) {
-          rightDescBox.SetActive(show);
+          LocalizationUtils.SetActiveAndUpdate(rightDescBox, show);
         }
       }
     }

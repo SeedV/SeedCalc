@@ -34,36 +34,136 @@ MonoBehaviour:
     m_Localized: 1E+10 m
     m_Metadata:
       m_Items: []
-  - m_Id: 52941309337600
-    m_Localized: <size=40>m</size>
+  - m_Id: 8682527312044032
+    m_Localized: SeedCalc
     m_Metadata:
       m_Items: []
-  - m_Id: 162757788819456
-    m_Localized: m
+  - m_Id: 8683941459386368
+    m_Localized: About
     m_Metadata:
       m_Items: []
-  - m_Id: 1089811799597056
-    m_Localized: m
+  - m_Id: 8684000355803136
+    m_Localized: Language
     m_Metadata:
       m_Items: []
-  - m_Id: 1780705435574272
-    m_Localized: m
+  - m_Id: 8684063836594176
+    m_Localized: Sound
     m_Metadata:
       m_Items: []
-  - m_Id: 1780776021516288
-    m_Localized: 1E+10 m
+  - m_Id: 8689349687238656
+    m_Localized: 'Sound: On'
     m_Metadata:
       m_Items: []
-  - m_Id: 1780837812002816
-    m_Localized: 1E-10 m
+  - m_Id: 8689417911787520
+    m_Localized: 'Sound: Off'
     m_Metadata:
       m_Items: []
-  - m_Id: 1780887791329280
-    m_Localized: 1 m
+  - m_Id: 8696061483802624
+    m_Localized: '<b><size=40>Fluorine Atom</size></b>
+
+      <size=33>The radius
+      of a fluorine atom is about 147 picometers. A picometer (pm) is one trillionth
+      of a meter, or 0.000000000001 meters.</size>'
     m_Metadata:
       m_Items: []
-  - m_Id: 1781029252620288
-    m_Localized: m
+  - m_Id: 8716431418974208
+    m_Localized: Settings
+    m_Metadata:
+      m_Items: []
+  - m_Id: 8726792620728320
+    m_Localized: '<b><size=30>About SeedCalc</size></b>
+
+      SeedCalc is built
+      and released by the SeedV Lab (www.seedv.com).
+
+      SeedCalc is open-sourced
+      at github...
+
+      SeedCalc is made possible by the SeedLang open-source project,
+      built by the SeedV Lab, released at github...
+
+
+      <b><size=30>Dev Team</size></b>
+
+      Name
+      1, Name 2, Name 3, Name 4, Name 5, Name 6, Name 7, Name 8
+
+
+      <b><size=30>Credits</size></b>
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+      The
+      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
+
+'
     m_Metadata:
       m_Items: []
   references:

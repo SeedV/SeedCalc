@@ -24,13 +24,13 @@ namespace SeedCalc {
   // The UI component of the calculator screen.
   public class CalculatorScreen : MonoBehaviour {
     private const string _errPrefix = "ERR:";
-    private const string _colorHighlighted = "#f10";
-    private const string _colorNumber = "#000";
-    private const string _colorMulDiv = "#e539e5";
-    private const string _colorAddSub = "#00b4f0";
-    private const string _colorParenthesis = "#655aff";
+    private const string _colorHighlighted = "#f60";
+    private const string _colorNumber = "#fff";
+    private const string _colorMulDiv = "#ffbc33";
+    private const string _colorAddSub = "#88c882";
+    private const string _colorParenthesis = "#958dff";
     private const string _colorInvalid = "#666";
-    private const string _colorBeingCalculated = "#f90";
+    private const string _colorBeingCalculated = "#e56663";
     private static readonly string _initialText = $"<color={_colorNumber}>0</color>";
 
     private static readonly Dictionary<string, string> _displayOperators =

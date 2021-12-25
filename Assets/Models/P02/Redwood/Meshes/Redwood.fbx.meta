@@ -7,58 +7,38 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Brown1
-    second: {fileID: 2100000, guid: cf66676ccbd494821845b9a4045d49b1, type: 2}
+      name: Material.Brown
+    second: {fileID: 2100000, guid: afe695db3a5c442c4b4c9002a0e4ab70, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Brown2
-    second: {fileID: 2100000, guid: 244cf448ab41149709a58c311ecf47e4, type: 2}
+      name: Material.Green
+    second: {fileID: 2100000, guid: 5c3dd2966b1d4475faf465340e41eefd, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Brown3
-    second: {fileID: 2100000, guid: 3e35391aa39c9438d864bae69cca8157, type: 2}
+      name: Material.MainStruct
+    second: {fileID: 2100000, guid: e17f2fed4045f48c0a1d936d866adeee, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Brown4
-    second: {fileID: 2100000, guid: 1e92987c4fb064d0ea0a83464acc32c9, type: 2}
+      name: Material.Roof
+    second: {fileID: 2100000, guid: 682b79b44b8474bc4a225e73230004ab, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Gray
-    second: {fileID: 2100000, guid: 9e895115c452147379d5349ae3563000, type: 2}
+      name: Material.Trunk
+    second: {fileID: 2100000, guid: d2cfbd66d586641578911332be9ebdca, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Green1
-    second: {fileID: 2100000, guid: 98c7319ed4cb94d8ea80f9949efffe21, type: 2}
+      name: Material.Window
+    second: {fileID: 2100000, guid: dec348013b2d2477f8475d267fedcbb7, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Redwood.Green2
-    second: {fileID: 2100000, guid: 9d399279cf9504f28a4589be6d8c389c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Redwood.Green3
-    second: {fileID: 2100000, guid: 831b2084b3ae249aea9ef6f6509f2685, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Redwood.Pink
-    second: {fileID: 2100000, guid: 15ae0da583579465b98a07df29b185e4, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Redwood.Purple
-    second: {fileID: 2100000, guid: 9c55aa88fceaa43a68759975462b055f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Redwood.White
-    second: {fileID: 2100000, guid: afeab017501c7419b9eb05eb7b2ef8a4, type: 2}
+      name: Material.Yellow
+    second: {fileID: 2100000, guid: 6df06bea7620a4a4f80679a93db17534, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
