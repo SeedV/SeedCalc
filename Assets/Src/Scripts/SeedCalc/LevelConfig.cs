@@ -175,7 +175,7 @@ namespace SeedCalc {
         LeftObjCandidates = new RefObjConfig[] {
           new RefObjConfig {
             ObjName = "FluorineAtom",
-            InitialPosition = new Vector3(-2.65f, -2.65f, -10f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.65f, -10f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.65f, -.5f),
           },
@@ -200,7 +200,7 @@ namespace SeedCalc {
         LeftObjCandidates = new RefObjConfig[] {
           new RefObjConfig {
             ObjName = "DNA",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -1.2f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.7f, -.5f),
           },
