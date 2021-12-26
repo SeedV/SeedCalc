@@ -63,6 +63,12 @@ crashlytics-build.properties
 
 # Packed Addressables
 /[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/iOS.meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/iOS/
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/Windows.meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/Windows/
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/OSX.meta
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/OSX/
 
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
