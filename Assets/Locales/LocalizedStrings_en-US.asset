@@ -71,99 +71,44 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8726792620728320
-    m_Localized: '<b><size=30>About SeedCalc</size></b>
-
-      SeedCalc is built
-      and released by the SeedV Lab (www.seedv.com).
-
-      SeedCalc is open-sourced
-      at github...
-
-      SeedCalc is made possible by the SeedLang open-source project,
-      built by the SeedV Lab, released at github...
-
-
-      <b><size=30>Dev Team</size></b>
-
-      Name
-      1, Name 2, Name 3, Name 4, Name 5, Name 6, Name 7, Name 8
-
-
-      <b><size=30>Credits</size></b>
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-      The
-      xyz model is a derived work of XYZ, licensed under the ZYX license (http://www....).
-
-'
+    m_Localized: "<b><size=32>About SeedCalc</size></b>\nSeedCalc is built and released
+      by the SeedV Lab (www.seedv.com).\nSeedCalc (commercial licensed assets are
+      not included) is open-sourced under the Apache License 2.0 at github.com/SeedV/SeedCalc\nSeedCalc
+      is built on top of another open-source software released by the SeedV Lab,
+      at github.com/SeedV/SeedLang \n\n<b><size=32>Dev Team</size></b>\nChao Tong,
+      Echo, Mr. HOW, Tata, Yirui Cai, codingpotato, wixette, \u5F90\u5927\u767D\n\n<b><size=32>Credits</size></b>\nSome
+      audio files are derived work of the Ultimate Sound FX Bundle asset, released
+      by Sidearm Studios, at assetstore.unity.com/packages/audio/sound-fx/ultimate-sound-fx-bundle-151756\nThe
+      fonts Fira Mono, Fira Sans, Noto Sans SC, Nunito Sans are released under the
+      SIL Open Font License (OFL) and can be downloaded from fonts.google.com\nThe
+      Cabbage Seed model is a derived work of the Cabbage model (skfb.ly/69TYn) by
+      Feyfolken-K, licensed under Creative Commons Attribution.\nThe Catalase model
+      is a derived work of 1DGB HUMAN ERYTHROCYTE CATALASE (www.rcsb.org/structure/1DGB),
+      released by www.rcsb.org under the CC0 1.0 Universal (CC0 1.0) Public Domain
+      Dedication.\nThe Mountain Tai model is a derived work of the Low Poly Mountain
+      scene (skfb.ly/FtxN) by David Junghanns, licensed under Creative Commons Attribution.\nThe
+      Everest model is a derived work of the Everest - Lowpoly (skfb.ly/6SYqz) by
+      c0ntra5t, licensed under Creative Commons Attribution.\nThe photos of Manicouagan
+      Reservoir use the data of Copernicus Sentinel data 2018, CC BY-SA 3.0 IGO,
+      via Wikimedia Commons, and STS009-048-3139 Manicouagan Reservoir, National
+      Aeronautics & Space Administration, Public domain, via Wikimedia Commons.\nThe
+      models including Cat, Jelly Fish, Rabbit, Deer, Penguin, Velociraptor, Giraffe,
+      Orca, Tyrannosaurus are derived from polyperfect.com's work, released at www.polyperfect.com\nThe
+      Bee model is a derived work of Rigged Bee Low-poly 3D model by output, released
+      at www.cgtrader.com/3d-models/animals/insect/rigged-low-poly-honeybee\nThe
+      Red Blood Cell model, the Egg and Sperm model, the Flu Virus model are derived
+      work of Low Poly Biology Pack by Baria3DAsset, released at www.cgtrader.com/3d-models/science/medical/low-poly-biology-pack\nThe
+      E.Coli model is a derived work of Escherichia coli bacteria by tartino, released
+      at www.cgtrader.com/3d-models/science/medical/escherichia-coli-bacteria\nThe
+      DNA model is a derived work of DNA Molecule by bptom, released at www.cgtrader.com/3d-models/various/various-models/dna-molecule-v1-002\nThe
+      Ceres model is a derived work of Low Poly Solar System by Shakirov Rinat, released
+      at www.cgtrader.com/3d-models/space/planet/low-poly-solar-system\nThe Earth
+      model is a derived work of Planet Earth by Maksim Batyrev, released at skfb.ly/68VoW\nThe
+      Jupiter model is a derived work of Low Poly Jupiter 3D by DAzBjax, released
+      at www.turbosquid.com/3d-models/jupiter-3d-1156671\nThe Sun model is a derived
+      work of Low Poly Solar System by Anton Moek, released at www.cgtrader.com/3d-models/space/planet/low-poly-solar-system-cb536cff-3228-44f6-9580-63cc60be1545\nThe
+      photos of the Blockhole use the data of Black Hole Accretion Disk Visualization,
+      released by NASA's Goddard Space Flight Center/Jeremy Schnittman, at svs.gsfc.nasa.gov/13326\n"
     m_Metadata:
       m_Items: []
   - m_Id: 10483132040994816
