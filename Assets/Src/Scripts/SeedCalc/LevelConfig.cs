@@ -438,7 +438,7 @@ namespace SeedCalc {
           },
           new RefObjConfig {
             ObjName = "Deer",
-            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },
