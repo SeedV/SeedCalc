@@ -424,9 +424,9 @@ namespace SeedCalc {
           },
           new RefObjConfig {
             ObjName = "Rabbit",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.6f, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.5f, -.5f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingLeftX, -2.6f, -.5f),
+                new Vector3(LevelConfig.VanishingLeftX, -2.5f, -.5f),
           },
         },
         RightObjCandidates = new RefObjConfig[] {
