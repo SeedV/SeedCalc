@@ -499,7 +499,6 @@ namespace SeedCalc {
     }
 
     private void ScrollRainbowToRightEnd() {
-      float texOffsetX = 1.0f;
       GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new UnityEngine.Vector2(1, 0));
     }
 
