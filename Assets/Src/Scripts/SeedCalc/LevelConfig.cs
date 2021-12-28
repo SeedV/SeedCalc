@@ -90,6 +90,10 @@ namespace SeedCalc {
 
   // The global definitions of all the visualization levels.
   public static class LevelConfigs {
+    // The min and max visualizable numbers of all the configured levels.
+    public static double MinVisualizableNumber => Levels[0].MinVisualizableNumber;
+    public static double MaxVisualizableNumber => Levels[Levels.Count - 1].MaxVisualizableNumber;
+
     // Constructs the container name of a reference object.
     public static string GetContainerName(string objName) {
       return $"{objName}_Container";
@@ -98,6 +102,16 @@ namespace SeedCalc {
     // Constructs the parent object name of a level's description boxes.
     public static string GetDescPanelName(int level) {
       return $"Level_{level}";
+    }
+
+    // Gets the parent object name of the left end description boxes.
+    public static string GetLeftEndDescPanelName() {
+      return $"Level_LeftEnd";
+    }
+
+    // Gets the parent object name of the right end description boxes.
+    public static string GetRightEndDescPanelName() {
+      return $"Level_RightEnd";
     }
 
     // Constructs the description box name of a reference object.
@@ -117,10 +131,10 @@ namespace SeedCalc {
       }
       for (int level = 0; level < Levels.Count; level++) {
         var config = Levels[level];
-        // Uses a [Min, Max) range to determinate if the number falls in a particular level, except
+        // Uses a (Min, Max] range to determinate if the number falls in a particular level, except
         // for the first level where [Min, Max] is used.
         //
-        // If a (Min, Max] range is needed, the following conditions can be used instead:
+        // If a [Min, Max) range is needed, the following conditions can be used instead:
         //
         //     (number >= config.MinVisualizableNumber && number < config.MaxVisualizableNumber) ||
         //     (level == Levels.Count - 1 && number == config.MaxVisualizableNumber)
@@ -175,7 +189,7 @@ namespace SeedCalc {
         LeftObjCandidates = new RefObjConfig[] {
           new RefObjConfig {
             ObjName = "FluorineAtom",
-            InitialPosition = new Vector3(-2.65f, -2.65f, -10f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.65f, -10f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.65f, -.5f),
           },
@@ -200,7 +214,7 @@ namespace SeedCalc {
         LeftObjCandidates = new RefObjConfig[] {
           new RefObjConfig {
             ObjName = "DNA",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.7f, -1.2f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingLeftX, -2.7f, -.5f),
           },
@@ -424,9 +438,9 @@ namespace SeedCalc {
           },
           new RefObjConfig {
             ObjName = "Rabbit",
-            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.6f, -.5f),
+            InitialPosition = new Vector3(LevelConfig.LeftCenterX, -2.5f, -.5f),
             VanishingPosition =
-                new Vector3(LevelConfig.VanishingLeftX, -2.6f, -.5f),
+                new Vector3(LevelConfig.VanishingLeftX, -2.5f, -.5f),
           },
         },
         RightObjCandidates = new RefObjConfig[] {
@@ -438,7 +452,7 @@ namespace SeedCalc {
           },
           new RefObjConfig {
             ObjName = "Deer",
-            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -1f),
+            InitialPosition = new Vector3(LevelConfig.RightCenterX, LevelConfig.RightCenterY, -3f),
             VanishingPosition =
                 new Vector3(LevelConfig.VanishingRightX, LevelConfig.VanishingRightY, 40f),
           },

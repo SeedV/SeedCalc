@@ -28,18 +28,27 @@ namespace SeedCalc {
     public const int DefaultLevel = 0;
     public const string DefaultMarkerValueString = "0.5";
 
+    private bool _visible;
+
+    public bool Visible {
+      get => _visible;
+      set {
+        LocalizationUtils.SetActiveAndUpdate(gameObject, value);
+        _visible = value;
+      }
+    }
+
     public Sprite[] Sprites;
 
     public TextMeshProUGUI ScaleMarker;
 
     public void SetNavLevel(int navLevel, string scaleMarkerValueString) {
+      if (!Visible) {
+        Visible = true;
+      }
       Debug.Assert(navLevel >= MinLevel && navLevel <= MaxLevel);
       GetComponent<Image>().sprite = Sprites[navLevel - MinLevel];
       ScaleMarker.text = scaleMarkerValueString;
-    }
-
-    public void Show(bool visible) {
-      LocalizationUtils.SetActiveAndUpdate(gameObject, visible);
     }
   }
 }

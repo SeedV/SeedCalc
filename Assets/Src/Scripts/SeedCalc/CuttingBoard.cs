@@ -70,6 +70,9 @@ namespace SeedCalc {
     // levels.
     private Dictionary<(int level, string objName), GameObject> _descBoxes =
         new Dictionary<(int level, string objName), GameObject>();
+    // The description panels for the left end and the right end.
+    private GameObject _descLeftEndPanel = null;
+    private GameObject _descRightEndPanel = null;
     // Map from the reference object name to its container object and its own game object.
     private Dictionary<string, (GameObject Container, GameObject Obj)> _refObjs =
         new Dictionary<string, (GameObject Container, GameObject Obj)>();
@@ -139,7 +142,7 @@ namespace SeedCalc {
       GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : InactiveTexture;
       GetComponent<Renderer>().material.color =  active ? _activeColor : _inactiveColor;
       LightingMask.SetActive(active);
-      Nav.Show(active);
+      Nav.Visible = active;
       Indicator.Visible = active;
       ShowRefObjsAtLevel(_currentLevel, active);
       if (active && _currentLevel < 0) {
@@ -160,70 +163,101 @@ namespace SeedCalc {
         }
         if (_numberQueue.Count == 1) {
           double number = _numberQueue.Dequeue();
-          int level = LevelConfigs.MapNumberToLevel(number);
-          if (level >= 0) {
+          if (number <= 0) {
+            // Zero and negative numbers cannot be visualized. Turns off the cutting board. We do
+            // not turn the whole board to its inactive mode. Instead, we simply hide the number
+            // indicator while keeping the reference objects live on the board.
+            Indicator.Visible = false;
+          } else {
             if (!_active) {
               SetActive(true);
             }
-            // Hides desc panels during the transition.
-            ShowDescBoxesAtLevel(_currentLevel, false);
-            // Plays a separate animation to grow the indicator and show the indicator value.
-            double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
-            StartCoroutine(Indicator.SetValueWithAnim(indicatorMax, number));
-            if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
-              // Slides to the left/right neighbor level.
-              var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
-              Debug.Assert(animConfigs.Count > 0);
-              foreach (var animConfig in animConfigs) {
-                animConfig.PositionVelocity = Vector3.zero;
-                animConfig.ScaleVelocity = Vector3.zero;
-              }
-              while (!MathUtils.EqualsApproximately(animConfigs[0].Actor.transform.localPosition,
-                                                    animConfigs[0].ToPosition,
-                                                    0.005f)) {
-                foreach (var animConfig in animConfigs) {
-                  animConfig.Actor.transform.localPosition =
-                      Vector3.SmoothDamp(animConfig.Actor.transform.localPosition,
-                                         animConfig.ToPosition,
-                                         ref animConfig.PositionVelocity,
-                                         TransitionSmoothTime);
-                  animConfig.Actor.transform.localScale =
-                      Vector3.SmoothDamp(animConfig.Actor.transform.localScale,
-                                         animConfig.ToScale,
-                                         ref animConfig.ScaleVelocity,
-                                         TransitionSmoothTime);
-                }
-                yield return null;
-              }
-              foreach (var animConfig in animConfigs) {
-                animConfig.Actor.transform.localPosition = animConfig.ToPosition;
-                animConfig.Actor.transform.localScale = animConfig.ToScale;
-              }
-              if (!(objectToHideAfterAnim is null)) {
-                objectToHideAfterAnim.SetActive(false);
-              }
-              PlaySound(SlideToSound);
-            } else if (_currentLevel != level) {
-              // Jumps to the target level directly. For now there is no transition animation when
-              // jumping to a non-neighbor level.
-              JumpToLevel(level);
-              PlaySound(JumpToSound);
+            int level = LevelConfigs.MapNumberToLevel(number);
+            if (level >= 0) {
+              yield return TransitionToLevel(number, level);
+            } else {
+              TransitionToLeftOrRightEnd(number);
             }
-            // Shows everything up once the transition is done.
-            _currentLevel = level;
-            Nav.SetNavLevel(LevelConfigs.Levels[level].NavLevel,
-                            LevelConfigs.Levels[level].ScaleMarkerValueString);
-            ScrollRainbowTo(LevelConfigs.Levels[level].NavLevel);
-            ShowDescBoxesAtLevel(_currentLevel, true);
-          } else {
-            // When a number is not able to be visualized, we do not turn the whole board to its
-            // inactive mode. Instead, we simply hide the number indicator while keeping the
-            // reference objects live on the board.
-            Indicator.Visible = false;
           }
         }
         yield return null;
       }
+    }
+
+    private IEnumerator TransitionToLevel(double number, int level) {
+      // Hides desc panels during the transition.
+      ShowDescBoxesAtLevel(_currentLevel, false);
+      // Plays a separate animation to grow the indicator and show the indicator value.
+      double indicatorMax = LevelConfigs.Levels[level].ScalePerLargeUnit * _LargeCellRows;
+      StartCoroutine(Indicator.SetValueWithAnim(indicatorMax, number));
+      if (_currentLevel >= 0 && (_currentLevel == level + 1 || _currentLevel == level - 1)) {
+        // Slides to the left/right neighbor level.
+        var animConfigs = PrepareSlideTransition(level, out GameObject objectToHideAfterAnim);
+        Debug.Assert(animConfigs.Count > 0);
+        foreach (var animConfig in animConfigs) {
+          animConfig.PositionVelocity = Vector3.zero;
+          animConfig.ScaleVelocity = Vector3.zero;
+        }
+        while (!MathUtils.EqualsApproximately(animConfigs[0].Actor.transform.localPosition,
+                                              animConfigs[0].ToPosition,
+                                              0.005f)) {
+          foreach (var animConfig in animConfigs) {
+            animConfig.Actor.transform.localPosition =
+                Vector3.SmoothDamp(animConfig.Actor.transform.localPosition,
+                                   animConfig.ToPosition,
+                                   ref animConfig.PositionVelocity,
+                                   TransitionSmoothTime);
+            animConfig.Actor.transform.localScale =
+                Vector3.SmoothDamp(animConfig.Actor.transform.localScale,
+                                   animConfig.ToScale,
+                                   ref animConfig.ScaleVelocity,
+                                   TransitionSmoothTime);
+          }
+          yield return null;
+        }
+        foreach (var animConfig in animConfigs) {
+          animConfig.Actor.transform.localPosition = animConfig.ToPosition;
+          animConfig.Actor.transform.localScale = animConfig.ToScale;
+        }
+        if (!(objectToHideAfterAnim is null)) {
+          objectToHideAfterAnim.SetActive(false);
+        }
+        PlaySound(SlideToSound);
+      } else if (_currentLevel != level) {
+        // Jumps to the target level directly. For now there is no transition animation when
+        // jumping to a non-neighbor level.
+        JumpToLevel(level);
+        PlaySound(JumpToSound);
+      }
+      // Shows everything up once the transition is done.
+      _currentLevel = level;
+      Nav.SetNavLevel(LevelConfigs.Levels[level].NavLevel,
+                      LevelConfigs.Levels[level].ScaleMarkerValueString);
+      ScrollRainbowTo(LevelConfigs.Levels[level].NavLevel);
+      ShowDescBoxesAtLeftEnd(false);
+      ShowDescBoxesAtRightEnd(false);
+      ShowDescBoxesAtLevel(_currentLevel, true);
+    }
+
+    private void TransitionToLeftOrRightEnd(double number) {
+      // For the postive numbers that are out of the LevelConfigs' min and max bounds, shows
+      // the indicator only, without any reference object.
+      ShowDescBoxesAtLevel(_currentLevel, false);
+      ShowRefObjsAtLevel(_currentLevel, false);
+      Nav.Visible = false;
+      if (number < LevelConfigs.MinVisualizableNumber) {
+        // The number exceeds the lower bound.
+        ScrollRainbowToLeftEnd();
+        ShowDescBoxesAtLeftEnd(true);
+        ShowDescBoxesAtRightEnd(false);
+      } else {
+        // The number exceeds the upper bound.
+        ScrollRainbowToRightEnd();
+        ShowDescBoxesAtLeftEnd(false);
+        ShowDescBoxesAtRightEnd(true);
+      }
+      Indicator.SetValue(MathUtils.OrderOfMagnitudeUpperBound(number), number);
+      _currentLevel = -1;
     }
 
     private void SetupRefObjs() {
@@ -282,6 +316,10 @@ namespace SeedCalc {
           }
         }
       }
+      _descLeftEndPanel =
+          RootOfDescPanels.transform.Find(LevelConfigs.GetLeftEndDescPanelName()).gameObject;
+      _descRightEndPanel =
+          RootOfDescPanels.transform.Find(LevelConfigs.GetRightEndDescPanelName()).gameObject;
     }
 
     private void JumpToLevel(int level) {
@@ -329,6 +367,14 @@ namespace SeedCalc {
           LocalizationUtils.SetActiveAndUpdate(rightDescBox, show);
         }
       }
+    }
+
+    private void ShowDescBoxesAtLeftEnd(bool show) {
+      LocalizationUtils.SetActiveAndUpdate(_descLeftEndPanel, show);
+    }
+
+    private void ShowDescBoxesAtRightEnd(bool show) {
+      LocalizationUtils.SetActiveAndUpdate(_descRightEndPanel, show);
     }
 
     private IReadOnlyList<SlideAnimConfig> PrepareSlideTransition(
@@ -445,6 +491,15 @@ namespace SeedCalc {
       }
       GetComponent<Renderer>().material.SetTextureOffset("_MainTex",
                                                          new UnityEngine.Vector2(texOffsetX, 0));
+    }
+
+    private void ScrollRainbowToLeftEnd() {
+      GetComponent<Renderer>().material.SetTextureOffset(
+          "_MainTex", new UnityEngine.Vector2(_rainbowTexInitOffsetX, 0));
+    }
+
+    private void ScrollRainbowToRightEnd() {
+      GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new UnityEngine.Vector2(1, 0));
     }
 
     private void PlaySound(AudioClip audioClip, float volumeScale = 1f) {

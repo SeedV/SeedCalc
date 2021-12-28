@@ -19,16 +19,26 @@ namespace SeedCalc.Tests {
   public class NumberFormatterFixtureData {
     public static IEnumerable FixtureParams {
       get {
+        yield return new TestFixtureData(-98765432109876, "-9.8765E+013");
+        yield return new TestFixtureData(-1234567890123, "-1.2346E+012");
+        yield return new TestFixtureData(-333, "-333");
+        yield return new TestFixtureData(-0.000001, "-0.000001");
+        yield return new TestFixtureData(0, "0");
+        yield return new TestFixtureData(0.9e-10, "9.0000E-011");
         yield return new TestFixtureData(1e-10, "0.0000000001");
-        yield return new TestFixtureData(1.1e-10, "0.00000000011");
+        yield return new TestFixtureData(1.1e-10, "0.0000000001");
         yield return new TestFixtureData(1, "1");
         yield return new TestFixtureData(3.14, "3.14");
         yield return new TestFixtureData(31.4, "31.4");
         yield return new TestFixtureData(100, "100");
         yield return new TestFixtureData(99999, "99999");
-        yield return new TestFixtureData(3.14159265358979e+9, "3141592653.59");
+        yield return new TestFixtureData(3.14159265358979e+9, "3141592653.6");
         yield return new TestFixtureData(9.999e+9, "9999000000");
-        yield return new TestFixtureData(1e+10, "10000000000");
+        yield return new TestFixtureData(10000000000, "10000000000");
+        yield return new TestFixtureData(10000000000.001, "10000000000");
+        yield return new TestFixtureData(60000000000, "60000000000");
+        yield return new TestFixtureData(60000000000.00001, "6.0000E+010");
+        yield return new TestFixtureData(98765432109876, "9.8765E+013");
       }
     }
   }
@@ -46,7 +56,8 @@ namespace SeedCalc.Tests {
 
     [Test]
     public void TestRangeAndFormatter() {
-      Assert.AreEqual(_result, NumberFormatter.Format(_value, 13));
+      string formatted = NumberFormatter.Format(_value, 11);
+      Assert.AreEqual(_result, formatted);
     }
   }
 }

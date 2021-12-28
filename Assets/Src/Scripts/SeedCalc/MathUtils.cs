@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using UnityEngine;
 
 namespace SeedCalc {
@@ -36,6 +37,18 @@ namespace SeedCalc {
       float diffZ = a.z - b.z;
       float squareDistance = diffX * diffX + diffY * diffY + diffZ * diffZ;
       return squareDistance < epsilon * epsilon;
+    }
+
+    // Returns the upper bound of a positive double value's order of magnitude. For example, returns
+    // 10 for 3, 100 for 30, 0.1 for 0.03, 0.01 for 0.003. etc.
+    //
+    // A boundary number will be counted as the upper bound of its lower order of magnitude. For
+    // example, this method returns 10 for 10, 0.1 for 0.1, etc.
+    public static double OrderOfMagnitudeUpperBound(double value) {
+      Debug.Assert(value > 0);
+      double log = Math.Log10(value);
+      int power = log % 1 == 0 ? (int)log : (int)Math.Floor(log + 1);
+      return Math.Pow(10, power);
     }
   }
 }

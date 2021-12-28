@@ -67,6 +67,226 @@ MonoBehaviour:
     m_Key: MainScene/OverlayCanvas/AboutDialog/Background/ScrollView/Viewport/AboutText
     m_Metadata:
       m_Items: []
+  - m_Id: 10483132040994816
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_1/FluorineAtom_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10484934933209088
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_1/DNA_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10486493796622336
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_2/DNA_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10487300193509376
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_2/Catalase_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10489519374589952
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_3/Catalase_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10490050272813056
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_3/FluVirus_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10491288108392448
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_4/FluVirus_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10491904331341824
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_4/EColi_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493427329261568
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_5/EColi_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493610226081792
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_5/RedBloodCell_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10494618767450112
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_6/RedBloodCell_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10494800766689280
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_6/EggCell_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10495976178442240
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_7/EggCell_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10496915685761024
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_7/CabbageSeed_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10498646159122432
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_8/CabbageSeed_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10499622169468928
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_8/Bee_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10518224884981760
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_9/Bee_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10519359167389696
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_9/Jellyfish_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10520198212739072
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_9/Rabbit_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10520635661869056
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_9/Cat_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10523457719623680
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Jellyfish_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10523994695393280
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Rabbit_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10524308869734400
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Cat_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10524749359734784
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Penguin_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10525128436736000
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Deer_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10526403622592512
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_10/Velociraptor_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10527644683591680
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Deer_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10527969574379520
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Penguin_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10528324739653632
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Velociraptor_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10529561014951936
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Orca_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10529981347127296
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Giraffe_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10530724661682176
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_11/Tyrannosaurus_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10532203116093440
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_12/Giraffe_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10532438399770624
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_12/Tyrannosaurus_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10532819322265600
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_12/Orca_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10533339508236288
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_12/Redwood_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10534592254566400
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_13/Redwood_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10535188231610368
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_13/Mountain_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10536613363834880
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_14/Mountain_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10537781179703296
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_14/Everest_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10538715108597760
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_15/Everest_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10539336184356864
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_15/Manicouagan_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10539972267335680
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_16/Manicouagan_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10540571893424128
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_16/Ceres_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10541112723759104
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_17/Ceres_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10541933398056960
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_17/Earth_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10543150165647360
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_18/Earth_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10543615242657792
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_18/Jupiter_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10544487204904960
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_19/Jupiter_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10544970942373888
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_19/Sun_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10545877067227136
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_20/Sun_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10546498801491968
+    m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_20/Blackhole_Desc/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11101421465231360
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_LeftEnd/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11102442308493312
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_LeftEnd/Text2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11103697038729216
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_RightEnd/Text1
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

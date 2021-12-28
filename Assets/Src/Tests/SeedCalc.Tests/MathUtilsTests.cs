@@ -80,4 +80,36 @@ namespace SeedCalc.Tests {
       Assert.AreEqual(_result, MathUtils.EqualsApproximately(_a, _b, _epsilon));
     }
   }
+
+  public class OrderOfMagnitudeUpperBoundFixtureData {
+    public static IEnumerable FixtureParams {
+      get {
+        yield return new TestFixtureData(10, 10);
+        yield return new TestFixtureData(3, 10);
+        yield return new TestFixtureData(100, 100);
+        yield return new TestFixtureData(30, 100);
+        yield return new TestFixtureData(1E+15, 1E+15);
+        yield return new TestFixtureData(3.14E+15, 1E+16);
+        yield return new TestFixtureData(1E-15, 1E-15);
+        yield return new TestFixtureData(3.14E-15, 1E-14);
+      }
+    }
+  }
+
+  [TestFixtureSource(typeof(OrderOfMagnitudeUpperBoundFixtureData),
+                     nameof(OrderOfMagnitudeUpperBoundFixtureData.FixtureParams))]
+  public class OrderOfMagnitudeUpperBoundTests {
+    private double _value;
+    private double _result;
+
+    public OrderOfMagnitudeUpperBoundTests(double value, double result) {
+      _value = value;
+      _result = result;
+    }
+
+    [Test]
+    public void TestOrderOfMagnitudeUpperBound() {
+      Assert.AreEqual(_result, MathUtils.OrderOfMagnitudeUpperBound(_value));
+    }
+  }
 }
