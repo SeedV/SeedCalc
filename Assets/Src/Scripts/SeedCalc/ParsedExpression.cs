@@ -71,7 +71,11 @@ namespace SeedCalc {
       if (token.Type != SyntaxType.Number) {
         return false;
       }
-      number = double.Parse(ExtractTokenText(token));
+      try {
+        number = double.Parse(ExtractTokenText(token));
+      } catch {
+        return false;
+      }
       return true;
     }
 
