@@ -142,7 +142,7 @@ namespace SeedCalc {
       GetComponent<Renderer>().material.mainTexture = active ? RainbowTexture : InactiveTexture;
       GetComponent<Renderer>().material.color =  active ? _activeColor : _inactiveColor;
       LightingMask.SetActive(active);
-      Nav.Show(active);
+      Nav.Visible = active;
       Indicator.Visible = active;
       ShowRefObjsAtLevel(_currentLevel, active);
       if (active && _currentLevel < 0) {
@@ -169,6 +169,9 @@ namespace SeedCalc {
             // indicator while keeping the reference objects live on the board.
             Indicator.Visible = false;
           } else {
+            if (!_active) {
+              SetActive(true);
+            }
             int level = LevelConfigs.MapNumberToLevel(number);
             if (level >= 0) {
               yield return TransitionToLevel(number, level);
@@ -182,9 +185,6 @@ namespace SeedCalc {
     }
 
     private IEnumerator TransitionToLevel(double number, int level) {
-      if (!_active) {
-        SetActive(true);
-      }
       // Hides desc panels during the transition.
       ShowDescBoxesAtLevel(_currentLevel, false);
       // Plays a separate animation to grow the indicator and show the indicator value.
@@ -244,7 +244,7 @@ namespace SeedCalc {
       // the indicator only, without any reference object.
       ShowDescBoxesAtLevel(_currentLevel, false);
       ShowRefObjsAtLevel(_currentLevel, false);
-      Nav.SetNavLevel(Nav.MinLevel - 1, null);
+      Nav.Visible = false;
       if (number < LevelConfigs.MinVisualizableNumber) {
         // The number exceeds the lower bound.
         ScrollRainbowToLeftEnd();

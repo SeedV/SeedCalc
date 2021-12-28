@@ -33,7 +33,8 @@ namespace SeedCalc {
     public TextMeshProUGUI IndicatorValue;
 
     public void SetValue(double maxValueOfCurrentLevel, double value) {
-      Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 && value <= maxValueOfCurrentLevel);
+      Debug.Assert(maxValueOfCurrentLevel > 0 && value > 0 &&
+                   value <= maxValueOfCurrentLevel + 1e-5 /* epsilon */);
       IndicatorValue.text = NumberFormatter.Format(value);
       float percentage = GetPercentage(maxValueOfCurrentLevel, value);
       transform.localScale = new Vector3(1f, percentage, 1f);
@@ -88,7 +89,7 @@ namespace SeedCalc {
     }
 
     private float GetPercentage(double maxValueOfCurrentLevel, double value) {
-      return (float)(value / maxValueOfCurrentLevel);
+      return Mathf.Clamp((float)(value / maxValueOfCurrentLevel), 0f, 1f);
     }
 
     private void HideIndicatorValue() {
