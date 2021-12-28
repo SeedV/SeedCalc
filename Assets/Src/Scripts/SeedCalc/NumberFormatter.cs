@@ -19,7 +19,8 @@ namespace SeedCalc {
   public static class NumberFormatter {
     private const int _maxDisplayDigits = 11;
 
-    // Formats a visualizable number in fixed point format.
+    // Tries to format a double value with a fixed number of total digits. Outputs the number's
+    // scientific notation if the total number of digits exceeds the limit.
     //
     // maxDisplayDigits specifies the maximum number of all display digits [0-9] in the formated
     // string, excluding the point character "." if there is any.
@@ -30,7 +31,11 @@ namespace SeedCalc {
         leading = "-";
       }
       int integerDigits = value < 1.0 ? 1 : (int)Math.Floor(Math.Log10(value) + 1);
-      if (integerDigits > maxDisplayDigits) {
+      if (value == 0) {
+        return "0";
+      } else if (integerDigits > maxDisplayDigits ||
+                 value < LevelConfigs.MinVisualizableNumber ||
+                 value > LevelConfigs.MaxVisualizableNumber) {
         int scientificFractionalDigits = maxDisplayDigits - 7;
         string format = $"E{scientificFractionalDigits}";
         return leading + value.ToString(format);

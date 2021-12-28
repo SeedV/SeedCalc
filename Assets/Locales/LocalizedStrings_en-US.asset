@@ -545,5 +545,21 @@ MonoBehaviour:
       black hole with a diameter of about 44 million kilometers.</size>'
     m_Metadata:
       m_Items: []
+  - m_Id: 11101421465231360
+    m_Localized: Wow, your number has gone so small beyond the limit of this calculator!
+      Go for it into the infinite microworld!
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11102442308493312
+    m_Localized: What do the numbers and the letter E on the screen mean? It's "scientific
+      notation", a way of expressing numbers which are too large or too small to
+      be conveniently written in decimal form.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11103697038729216
+    m_Localized: Wow, your number has gone so large beyond the limit of this calculator!
+      Go for it into the infinite universe!
+    m_Metadata:
+      m_Items: []
   references:
     version: 1

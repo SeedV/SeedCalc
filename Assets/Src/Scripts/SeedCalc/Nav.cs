@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,17 +30,28 @@ namespace SeedCalc {
     public const string DefaultMarkerValueString = "0.5";
 
     public Sprite[] Sprites;
-
+    public Sprite SpriteOutOfBounds;
     public TextMeshProUGUI ScaleMarker;
 
     public void SetNavLevel(int navLevel, string scaleMarkerValueString) {
-      Debug.Assert(navLevel >= MinLevel && navLevel <= MaxLevel);
-      GetComponent<Image>().sprite = Sprites[navLevel - MinLevel];
-      ScaleMarker.text = scaleMarkerValueString;
+      if (navLevel < MinLevel || navLevel > MaxLevel) {
+        GetComponent<Image>().sprite = SpriteOutOfBounds;
+        ShowChildren(false);
+      } else {
+        GetComponent<Image>().sprite = Sprites[navLevel - MinLevel];
+        ShowChildren(true);
+        ScaleMarker.text = scaleMarkerValueString;
+      }
     }
 
     public void Show(bool visible) {
       LocalizationUtils.SetActiveAndUpdate(gameObject, visible);
+    }
+
+    private void ShowChildren(bool visible) {
+      foreach (Transform child in transform) {
+        LocalizationUtils.SetActiveAndUpdate(child.gameObject, visible);
+      }
     }
   }
 }

@@ -275,6 +275,18 @@ MonoBehaviour:
     m_Key: ProductionMainScene/OverlayCanvas/RootOfDescPanels/Level_20/Blackhole_Desc/Text
     m_Metadata:
       m_Items: []
+  - m_Id: 11101421465231360
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_LeftEnd/Text
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11102442308493312
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_LeftEnd/Text2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 11103697038729216
+    m_Key: MainScene/OverlayCanvas/RootOfDescPanels/Level_RightEnd/Text1
+    m_Metadata:
+      m_Items: []
   m_Metadata:
     m_Items: []
   m_KeyGenerator:

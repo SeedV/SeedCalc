@@ -90,6 +90,10 @@ namespace SeedCalc {
 
   // The global definitions of all the visualization levels.
   public static class LevelConfigs {
+    // The min and max visualizable numbers of all the configured levels.
+    public static double MinVisualizableNumber => Levels[0].MinVisualizableNumber;
+    public static double MaxVisualizableNumber => Levels[Levels.Count - 1].MaxVisualizableNumber;
+
     // Constructs the container name of a reference object.
     public static string GetContainerName(string objName) {
       return $"{objName}_Container";
@@ -98,6 +102,16 @@ namespace SeedCalc {
     // Constructs the parent object name of a level's description boxes.
     public static string GetDescPanelName(int level) {
       return $"Level_{level}";
+    }
+
+    // Gets the parent object name of the left end description boxes.
+    public static string GetLeftEndDescPanelName() {
+      return $"Level_LeftEnd";
+    }
+
+    // Gets the parent object name of the right end description boxes.
+    public static string GetRightEndDescPanelName() {
+      return $"Level_RightEnd";
     }
 
     // Constructs the description box name of a reference object.
@@ -117,10 +131,10 @@ namespace SeedCalc {
       }
       for (int level = 0; level < Levels.Count; level++) {
         var config = Levels[level];
-        // Uses a [Min, Max) range to determinate if the number falls in a particular level, except
+        // Uses a (Min, Max] range to determinate if the number falls in a particular level, except
         // for the first level where [Min, Max] is used.
         //
-        // If a (Min, Max] range is needed, the following conditions can be used instead:
+        // If a [Min, Max) range is needed, the following conditions can be used instead:
         //
         //     (number >= config.MinVisualizableNumber && number < config.MaxVisualizableNumber) ||
         //     (level == Levels.Count - 1 && number == config.MaxVisualizableNumber)
