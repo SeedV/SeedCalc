@@ -494,15 +494,13 @@ namespace SeedCalc {
     }
 
     private void ScrollRainbowToLeftEnd() {
-      float texOffsetX = _rainbowTexInitOffsetX;
-      GetComponent<Renderer>().material.SetTextureOffset("_MainTex",
-                                                         new UnityEngine.Vector2(texOffsetX, 0));
+      GetComponent<Renderer>().material.SetTextureOffset(
+          "_MainTex", new UnityEngine.Vector2(_rainbowTexInitOffsetX, 0));
     }
 
     private void ScrollRainbowToRightEnd() {
       float texOffsetX = 1.0f;
-      GetComponent<Renderer>().material.SetTextureOffset("_MainTex",
-                                                         new UnityEngine.Vector2(texOffsetX, 0));
+      GetComponent<Renderer>().material.SetTextureOffset("_MainTex", new UnityEngine.Vector2(1, 0));
     }
 
     private void PlaySound(AudioClip audioClip, float volumeScale = 1f) {
