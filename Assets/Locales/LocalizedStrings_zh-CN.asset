@@ -74,7 +74,9 @@ MonoBehaviour:
       Apache License 2.0 \u534F\u8BAE\u5F00\u6E90\u3002\u89C1 github.com/SeedV/SeedCalc
       \n\u672C\u4EA7\u54C1\u662F\u57FA\u4E8E SeedV \u8292\u79CD\u661F\u7403\u5B9E\u9A8C\u5BA4\u7684\u53E6\u4E00\u6B3E\u5F00\u6E90\u8F6F\u4EF6
       SeedLang \u5F00\u53D1\u7684\u3002\u89C1 github.com/SeedV/SeedLang \n\n<b><size=32>\u7814\u53D1\u56E2\u961F</size></b>\nChao
-      Tong\uFF0CMr. HOW\uFF0Ccodingpotato\uFF0Cwixette\uFF0C\u8521\u4E59\u9510\uFF0C\u738B\u5854\u5854\uFF0C\u5F90\u5927\u767D\uFF0C\u5F20\u8FB0\u6B23\n\n<b><size=32>\u81F4\u8C22</size></b>\n\u90E8\u5206\u58F0\u97F3\u6587\u4EF6\u662F\u57FA\u4E8E
+      Tong\uFF0CMr. HOW\uFF0Ccodingpotato\uFF0Cwixette\uFF0C\u8521\u4E59\u9510\uFF0C\u738B\u5854\u5854\uFF0C\u5F90\u5927\u767D\uFF0C\u5F20\u8FB0\u6B23\n\n<b><size=32>\u81F4\u8C22</size></b>\n\u90E8\u5206\u6750\u8D28\u662F\u57FA\u4E8E
+      ambientCG\uFF08ambientcg.com\uFF09\u4EE5 Creative Commons CC0 1.0 Universal
+      License \u53D1\u5E03\u7684\u7D20\u6750\u5B8C\u6210\u7684\u3002\n\u90E8\u5206\u58F0\u97F3\u6587\u4EF6\u662F\u57FA\u4E8E
       Sidearm Studios \u53D1\u5E03\u7684 Ultimate Sound FX Bundle \u8D44\u6E90\u7814\u53D1\u7684\u3002\u539F\u8D44\u6E90\u5305\u53D1\u5E03\u5728
       assetstore.unity.com/packages/audio/sound-fx/ultimate-sound-fx-bundle-151756\n\u5B57\u4F53
       Fira Mono, Fira Sans, Noto Sans SC, Nunito Sans \u4EE5 SIL Open Font License
@@ -318,13 +320,13 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10533339508236288
-    m_Localized: "<b><size=50>\u6D77\u5CB8\u7EA2\u6749</size></b>\n<size=30>Cost
+    m_Localized: "<b><size=50>\u6D77\u5CB8\u7EA2\u6749</size></b>\n<size=30>Coast
       Redwood</size>\n\u6D77\u5CB8\u7EA2\u6749\u662F\u4E16\u754C\u4E0A\u73B0\u5B58\u6700\u9AD8\u7684\u6811\uFF0C\u9AD8\u5EA6\u53EF\u8FBE
       115 \u7C73\uFF0C\u76F4\u5F84\u53EF\u8FBE 9 \u7C73\u3002"
     m_Metadata:
       m_Items: []
   - m_Id: 10534592254566400
-    m_Localized: "<b><size=50>\u6D77\u5CB8\u7EA2\u6749</size></b>\n<size=30>Cost
+    m_Localized: "<b><size=50>\u6D77\u5CB8\u7EA2\u6749</size></b>\n<size=30>Coast
       Redwood</size>\n\u6D77\u5CB8\u7EA2\u6749\u662F\u4E16\u754C\u4E0A\u73B0\u5B58\u6700\u9AD8\u7684\u6811\uFF0C\u9AD8\u5EA6\u53EF\u8FBE
       115 \u7C73\uFF0C\u76F4\u5F84\u53EF\u8FBE 9 \u7C73\u3002"
     m_Metadata:
