@@ -395,17 +395,17 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 10533339508236288
-    m_Localized: '<b><size=40>Cost Redwood</size></b>
+    m_Localized: '<b><size=40>Coast Redwood</size></b>
 
-      <size=32>Cost Redwoods
+      <size=32>Coast Redwoods
       are the tallest living trees on Earth, reaching 115 meters in height and 9
       meters in diameter.</size>'
     m_Metadata:
       m_Items: []
   - m_Id: 10534592254566400
-    m_Localized: '<b><size=40>Cost Redwood</size></b>
+    m_Localized: '<b><size=40>Coast Redwood</size></b>
 
-      <size=32>Cost Redwoods
+      <size=32>Coast Redwoods
       are the tallest living trees on Earth, reaching 115 meters in height and 9
       meters in diameter.</size>'
     m_Metadata:
