@@ -375,7 +375,7 @@ namespace SeedCalc {
           case Message.RuntimeErrorDivideByZero:
             State = CalculatorState.DivBy0;
             break;
-          case Message.RuntimeOverflow:
+          case Message.RuntimeErrorOverflow:
             State = CalculatorState.Overflow;
             break;
           default:
