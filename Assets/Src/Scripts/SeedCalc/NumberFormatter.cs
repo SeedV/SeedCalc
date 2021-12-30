@@ -19,32 +19,36 @@ namespace SeedCalc {
   public static class NumberFormatter {
     private const int _maxDisplayDigits = 11;
 
-    // Tries to format a double value with a fixed number of total digits. Outputs the number's
-    // scientific notation if the total number of digits exceeds the limit.
-    //
-    // maxDisplayDigits specifies the maximum number of all display digits [0-9] in the formated
-    // string, excluding the point character "." if there is any.
-    public static string Format(double value, int maxDisplayDigits = _maxDisplayDigits) {
+    // Format a double value to a display string. If abs(value) is within the lower and upper bounds
+    // of LevelConfigs, formats the value to a string with at most 11 digits. Otherwise, outputs the
+    // value's scientific notation.
+    public static string Format(double value) {
       string leading = "";
       if (value < 0) {
         value = -value;
         leading = "-";
       }
       int integerDigits = value < 1.0 ? 1 : (int)Math.Floor(Math.Log10(value) + 1);
-      if (value == 0) {
-        return "0";
-      } else if (integerDigits > maxDisplayDigits ||
-                 value < LevelConfigs.MinVisualizableNumber ||
-                 value > LevelConfigs.MaxVisualizableNumber) {
-        int scientificFractionalDigits = maxDisplayDigits - 7;
+      if (ToBeFormattedInScientificNotation(value)) {
+        int scientificFractionalDigits = _maxDisplayDigits - 7;
         string format = $"E{scientificFractionalDigits}";
         return leading + value.ToString(format);
       } else {
-        int fractionalDigits = maxDisplayDigits - integerDigits;
+        int fractionalDigits = _maxDisplayDigits - integerDigits;
         string format = fractionalDigits > 0 ? $"F{fractionalDigits}" : $"F0";
         string formatted = value.ToString(format);
         return leading + (fractionalDigits > 0 ? formatted.TrimEnd('0').TrimEnd('.') : formatted);
       }
+    }
+
+    // Determines if the double value will be formatted in scientific notation, considering the
+    // lower and upper bounds of LevelConfigs.
+    public static bool ToBeFormattedInScientificNotation(double value) {
+      if (value < 0) {
+        value = -value;
+      }
+      return value > 0 && (value < LevelConfigs.MinVisualizableNumber ||
+                           value > LevelConfigs.MaxVisualizableNumber);
     }
   }
 }

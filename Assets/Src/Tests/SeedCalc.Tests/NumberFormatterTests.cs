@@ -56,7 +56,7 @@ namespace SeedCalc.Tests {
 
     [Test]
     public void TestRangeAndFormatter() {
-      string formatted = NumberFormatter.Format(_value, 11);
+      string formatted = NumberFormatter.Format(_value);
       Assert.AreEqual(_result, formatted);
     }
   }
