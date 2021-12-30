@@ -19,7 +19,7 @@ namespace SeedCalc {
   public static class NumberFormatter {
     private const int _maxDisplayDigits = 11;
 
-    // Format a double value to a display string. If abs(value) is within the lower and upper bounds
+    // Formats a double value to a display string. If abs(value) is within the lower and upper bounds
     // of LevelConfigs, formats the value to a string with at most 11 digits. Otherwise, outputs the
     // value's scientific notation.
     public static string Format(double value) {
