@@ -189,7 +189,25 @@ namespace SeedCalc.Tests {
       calculator.OnInput("=");
       Assert.AreEqual("3+3", calculator.ParsedExpression.Expression);
       Assert.AreEqual(6, calculator.Result);
-      // After a calculation, a new number input triggers a new expression.
+      // After a calculation, a new digit, dot or parenthesis input triggers a new expression.
+      calculator.OnInput("00");
+      calculator.OnInput("00");
+      calculator.OnInput("00");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput("=");
+      Assert.AreEqual("0", calculator.ParsedExpression.Expression);
+      calculator.OnInput(".");
+      Assert.AreEqual("0.", calculator.ParsedExpression.Expression);
+      calculator.OnInput("3");
+      Assert.AreEqual("0.3", calculator.ParsedExpression.Expression);
+      calculator.OnInput("AC");
+      calculator.OnInput("(");
+      Assert.AreEqual("(", calculator.ParsedExpression.Expression);
+      calculator.OnInput("AC");
+      calculator.OnInput("3");
+      calculator.OnInput("+");
+      calculator.OnInput("3");
+      calculator.OnInput("=");
       calculator.OnInput("0");
       Assert.AreEqual("0", calculator.ParsedExpression.Expression);
       calculator.OnInput("+");
@@ -197,7 +215,7 @@ namespace SeedCalc.Tests {
       calculator.OnInput("=");
       Assert.AreEqual("0+8", calculator.ParsedExpression.Expression);
       Assert.AreEqual(8, calculator.Result);
-      // While other characters continue to append on to the existing expression.
+      // While operators continue to append on to the existing expression.
       calculator.OnInput("*");
       Assert.AreEqual("0+8*", calculator.ParsedExpression.Expression);
       calculator.OnInput("3");

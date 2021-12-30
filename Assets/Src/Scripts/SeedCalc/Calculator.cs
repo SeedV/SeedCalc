@@ -119,7 +119,7 @@ namespace SeedCalc {
       }
     }
 
-    // TODO: Adjust this limit when the screen size / font design is updated.
+    // NOTE: Remember to adjust this limit when the screen size / font design is updated.
     private const int _maxChars = 40;
     private const string _moduleName = "SeedCalc";
     private const int _calcAnimBlinkTimes = 3;
@@ -184,39 +184,44 @@ namespace SeedCalc {
             break;
         }
       } else if (HasResult) {
+        if (CalculationMode == CalculationMode.DemoCalculationSteps &&
+            NumberFormatter.ToBeFormattedInScientificNotation((double)Result)) {
+          // If the calculation mode is DemoCalculationSteps, _cachedExpression will be set to the
+          // display string of the latest result. Considering the case that the result is formatted
+          // in scientific notation, _cachedExpression will contains an "E" character. In this case,
+          // it's not allowed to modify the current _cachedExpression, otherwise, users would be
+          // able to "input' the "E" character even there is no such key on the keyboard.
+          AllClear();
+        }
         switch (input) {
           case CalculatorInput.AllClear:
             AllClear();
             break;
+          case CalculatorInput.Equal:
+            // Nothing is expected for the "=" key when there is already a result.
+            break;
           case CalculatorInput.Del:
-            // When there is already a calculating result, a Del key modifies the input buffer and
+            // When there is already a calculation result, a "Del" key modifies the input buffer and
             // switches back to a no-result state - this enables users to edit the expression
             // in-place even after the result has been got.
             Result = null;
             Backspace();
             Parse();
             break;
-          case CalculatorInput.Equal:
-            break;
-          case CalculatorInput.N0:
-          case CalculatorInput.N00:
-          case CalculatorInput.N1:
-          case CalculatorInput.N2:
-          case CalculatorInput.N3:
-          case CalculatorInput.N4:
-          case CalculatorInput.N5:
-          case CalculatorInput.N6:
-          case CalculatorInput.N7:
-          case CalculatorInput.N8:
-          case CalculatorInput.N9:
-            // For numbers, clears the input buffer and the result, then starts from a new
-            // expresion.
-            _cachedExpression.Clear();
+          case CalculatorInput.Add:
+          case CalculatorInput.Sub:
+          case CalculatorInput.Mul:
+          case CalculatorInput.Div:
+            // For operators, users can continue inputing the expression while treating the latest
+            // result as the first operand. This enables users to input and evaluate an expression
+            // step by step manually.
             Result = null;
             HandleVisibleKeys(input);
             break;
           default:
-            Result = null;
+            // For all other cases, including digits, dot ant parenthsis, simply starts from a new
+            // expression.
+            AllClear();
             HandleVisibleKeys(input);
             break;
         }
@@ -375,7 +380,7 @@ namespace SeedCalc {
           case Message.RuntimeErrorDivideByZero:
             State = CalculatorState.DivBy0;
             break;
-          case Message.RuntimeOverflow:
+          case Message.RuntimeErrorOverflow:
             State = CalculatorState.Overflow;
             break;
           default:
