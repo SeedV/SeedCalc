@@ -41,9 +41,10 @@ echo "Fetching the latest version number from NuGet ..."
 readonly SEEDLANG_VERSION=`nuget list SeedLang -PreRelease | head -n 1`
 echo "Updating ${SEEDLANG_VERSION} ..."
 readonly SEEDLANG_PATH="${SEEDLANG_VERSION/ //}"
+readonly URL="https://www.nuget.org/api/v2/package/${SEEDLANG_PATH/+*/}"
 readonly SEEDLANG_PACKAGE="${TEMP_PLUGINS_DIR}/SeedLang.nuget.zip"
-curl -s -L "https://www.nuget.org/api/v2/package/${SEEDLANG_PATH}" \
-  -o "${SEEDLANG_PACKAGE}"
+echo "Downloading ${URL}"
+curl -s -L "${URL}" -o "${SEEDLANG_PACKAGE}"
 unzip -q "${SEEDLANG_PACKAGE}" -d "${TEMP_PLUGINS_DIR}"
 readonly SEEDLANG_DLL="${TEMP_PLUGINS_DIR}/lib/netstandard2.0/SeedLang.dll"
 echo "Recoding the updated version number ..."
