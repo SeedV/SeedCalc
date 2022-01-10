@@ -237,6 +237,8 @@ namespace SeedCalc {
       ShowDescBoxesAtLeftEnd(false);
       ShowDescBoxesAtRightEnd(false);
       ShowDescBoxesAtLevel(_currentLevel, true);
+      // Counts and determines if it's a good time to request app store review.
+      RequestReviewUtils.CountAndRequestReviewIfNecessary();
     }
 
     private void TransitionToLeftOrRightEnd(double number) {
