@@ -64,18 +64,18 @@ MonoBehaviour:
       data:
         m_ShortName:
           m_TableReference:
-            m_TableCollectionName: GUID:cefb883c8a2724890a49b69c6e47cd8e
+            m_TableCollectionName: 
           m_TableEntryReference:
-            m_KeyId: 8682527312044032
+            m_KeyId: 0
             m_Key: 
           m_FallbackState: 0
           m_WaitForCompletion: 0
           m_LocalVariables: []
         m_DisplayName:
           m_TableReference:
-            m_TableCollectionName: 
+            m_TableCollectionName: GUID:cefb883c8a2724890a49b69c6e47cd8e
           m_TableEntryReference:
-            m_KeyId: 0
+            m_KeyId: 8682527312044032
             m_Key: 
           m_FallbackState: 0
           m_WaitForCompletion: 0

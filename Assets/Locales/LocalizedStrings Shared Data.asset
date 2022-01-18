@@ -32,7 +32,7 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 8682527312044032
-    m_Key: BundleName
+    m_Key: BundleDisplayName
     m_Metadata:
       m_Items: []
   - m_Id: 8683941459386368
