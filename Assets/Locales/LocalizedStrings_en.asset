@@ -10,14 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e9620f8c34305754d8cc9a7e49e852d9, type: 3}
-  m_Name: LocalizedStrings_en-US
+  m_Name: LocalizedStrings_en
   m_EditorClassIdentifier: 
   m_LocaleId:
-    m_Code: en-US
+    m_Code: en
   m_SharedData: {fileID: 11400000, guid: cefb883c8a2724890a49b69c6e47cd8e, type: 2}
   m_Metadata:
     m_Items: []
   m_TableData:
+  - m_Id: 8682527312044032
+    m_Localized: SeedCalc
+    m_Metadata:
+      m_Items: []
   - m_Id: 171780857856
     m_Localized: m
     m_Metadata:
@@ -32,10 +36,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 9893535801344
     m_Localized: 1E+10 m
-    m_Metadata:
-      m_Items: []
-  - m_Id: 8682527312044032
-    m_Localized: SeedCalc
     m_Metadata:
       m_Items: []
   - m_Id: 8683941459386368

@@ -19,7 +19,7 @@ using UnityEngine.Localization.Settings;
 namespace SeedCalc {
   public static class LocalizationUtils {
     public const string ChineseLangCode = "zh-CN";
-    public const string EnglishLangCode = "en-US";
+    public const string EnglishLangCode = "en";
 
     // The preference key used by the player prefs selector.
     private const string _userPrefKeySelectedLocale = "selected-locale";
