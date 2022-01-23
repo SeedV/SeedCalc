@@ -22,8 +22,8 @@ MonoBehaviour:
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale
-  - m_GUID: c7fb382502daf438dad07d3b65e2f9f6
-    m_Address: English (United States) (en-US)
+  - m_GUID: 302de46e4605147bc98573a92b0be6bf
+    m_Address: English (en)
     m_ReadOnly: 1
     m_SerializedLabels:
     - Locale
