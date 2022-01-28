@@ -21,14 +21,41 @@ namespace SeedCalc {
     public const string ChineseLangCode = "zh-CN";
     public const string EnglishLangCode = "en";
 
-    // The preference key used by the player prefs selector.
-    private const string _userPrefKeySelectedLocale = "selected-locale";
+    // The preference key to record the user selected locale.
+    private const string _userPrefKeyUserSelectedLocale = "selected-locale";
 
-    public static bool SetLocale(string langCode) {
+    // The preference key to record the last system locale.
+    private const string _userPrefKeySystemLocale = "system-locale";
+
+    // The Unity's default System Locale Selector has a bug and always selects "en" on macOS. See
+    // https://github.com/SeedV/SeedCalc/issues/26 for more details.
+    //
+    // This method detects the locale per the following logic:
+    //
+    // 1. Detects the current system locale with Application.systemLanguage.
+    // 2. Detects if user has changed locale with the setting dialog. The locale set with the
+    //    setting dialog will be logged at _userPrefKeyUserSelectedLocale in the player prefs.
+    // 3. If user sets the locale with the setting dialog first, then changes the system locale,
+    //    follows the system locale.
+    public static void DetectAndSetLocale() {
+      string langCode = GetSystemLangCode(out bool systemLocaleChanged);
+      string userSelectedlangCode = PlayerPrefs.GetString(_userPrefKeyUserSelectedLocale, null);
+      if (!systemLocaleChanged && !(userSelectedlangCode is null)) {
+        langCode = userSelectedlangCode;
+        Debug.Log($"Using user selected locale: {langCode}.");
+      } else {
+        Debug.Log($"Using system locale: {langCode}.");
+      }
+      SetLocale(langCode, false);
+    }
+
+    public static bool SetLocale(string langCode, bool updateUserSelectedLocale) {
       var locale = LocalizationSettings.AvailableLocales.GetLocale(langCode);
       if (!(locale is null)) {
         LocalizationSettings.SelectedLocale = locale;
-        SaveLocale(langCode);
+        if (updateUserSelectedLocale) {
+          SaveLocale(_userPrefKeyUserSelectedLocale, langCode);
+        }
         Debug.Log($"Locale is set to {langCode}.");
         return true;
       } else {
@@ -78,11 +105,24 @@ namespace SeedCalc {
       }
     }
 
-    private static void SaveLocale(string langCode) {
+    private static void SaveLocale(string key, string langCode) {
       Debug.Assert(!string.IsNullOrEmpty(langCode));
-      PlayerPrefs.SetString(_userPrefKeySelectedLocale, langCode);
+      PlayerPrefs.SetString(key, langCode);
       // Flushes the prefs cache.
       PlayerPrefs.Save();
+    }
+
+    // Gets the system locale code. hasChanged will be set to true if the system locale is different
+    // with the one detected in the last time.
+    private static string GetSystemLangCode(out bool hasChanged) {
+      string systemLangCode =
+          (Application.systemLanguage == SystemLanguage.ChineseSimplified ||
+              Application.systemLanguage == SystemLanguage.Chinese) ?
+                ChineseLangCode : EnglishLangCode;
+      string lastSystemLangCode = PlayerPrefs.GetString(_userPrefKeySystemLocale, null);
+      SaveLocale(_userPrefKeySystemLocale, systemLangCode);
+      hasChanged = lastSystemLangCode != systemLangCode;
+      return systemLangCode;
     }
   }
 }

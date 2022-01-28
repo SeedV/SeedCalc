@@ -13,7 +13,9 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 using AgileMvvm;
 
@@ -73,7 +75,7 @@ namespace SeedCalc {
 
     public void OnSetChinese() {
       PlayClickSound();
-      if (LocalizationUtils.SetLocale(LocalizationUtils.ChineseLangCode)) {
+      if (LocalizationUtils.SetLocale(LocalizationUtils.ChineseLangCode, true)) {
         SetButtonState(_chineseButton, true);
         SetButtonState(_englishButton, false);
       }
@@ -81,7 +83,7 @@ namespace SeedCalc {
 
     public void OnSetEnglish() {
       PlayClickSound();
-      if (LocalizationUtils.SetLocale(LocalizationUtils.EnglishLangCode)) {
+      if (LocalizationUtils.SetLocale(LocalizationUtils.EnglishLangCode, true)) {
         SetButtonState(_chineseButton, false);
         SetButtonState(_englishButton, true);
       }
@@ -126,6 +128,11 @@ namespace SeedCalc {
       Debug.Assert(!(_soundOnText is null));
       _soundOffText = _soundSwitchButton.transform.Find("SoundOffText")?.gameObject;
       Debug.Assert(!(_soundOffText is null));
+    }
+
+    IEnumerator Start() {
+      yield return LocalizationSettings.InitializationOperation;
+      LocalizationUtils.DetectAndSetLocale();
     }
 
     private void SetButtonState(Button button, bool active) {
