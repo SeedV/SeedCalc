@@ -125,13 +125,19 @@ namespace SeedCalc {
     }
 
     void Update() {
-      if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject()) {
-        var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 100.0f)) {
-          if (_refObjs.TryGetValue(hit.transform.name,
-                                   out (GameObject Container, GameObject Obj) hitted)) {
-            hitted.Obj.GetComponent<Animator>()?.SetTrigger(_activeAnimTriggerName);
-            PlaySound(PlayAnimSound);
+      if (Input.GetMouseButtonDown(0)) {
+        bool mouseClickOnUiObject = EventSystem.current.IsPointerOverGameObject();
+        bool fingerTouchOnUiObject = Input.touches.Length > 0 ?
+            EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId) :
+            false;
+        if (!mouseClickOnUiObject && !fingerTouchOnUiObject) {
+          var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+          if (Physics.Raycast(ray, out RaycastHit hit, 100.0f)) {
+            if (_refObjs.TryGetValue(hit.transform.name,
+                                     out (GameObject Container, GameObject Obj) hitted)) {
+              hitted.Obj.GetComponent<Animator>()?.SetTrigger(_activeAnimTriggerName);
+              PlaySound(PlayAnimSound);
+            }
           }
         }
       }
