@@ -30,7 +30,8 @@ animations.
 
 ## Official releases and downloads
 
-_Coming soon..._
+- iOS App (iPad only): [SeedCalc - A Wonder
+  Calculator](https://apps.apple.com/app/seedcalc-a-wonder-calculator/id1606514630)
 
 ## How to
 
