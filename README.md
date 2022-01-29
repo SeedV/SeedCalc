@@ -3,6 +3,11 @@
 Numbers take you to wonders! Let kids explore how tall dinosaurs are, how small
 DNA is, and how big the sun is!
 
+## Official releases and downloads
+
+- iOS App (iPad only): [SeedCalc - A Wonder
+  Calculator](https://apps.apple.com/app/seedcalc-a-wonder-calculator/id1606514630)
+
 ![Screenshot1](./Screenshots/01_en.jpg)
 
 ## About SeedCalc
@@ -27,11 +32,6 @@ SeedCalc is a visualizable calculator application. It uses
 [SeedLang](https://github.com/SeedV/SeedLang) as the underlying runtime
 engine, demonstrating SeedLang's visualization abilities with educational
 animations.
-
-## Official releases and downloads
-
-- iOS App (iPad only): [SeedCalc - A Wonder
-  Calculator](https://apps.apple.com/app/seedcalc-a-wonder-calculator/id1606514630)
 
 ## How to
 
