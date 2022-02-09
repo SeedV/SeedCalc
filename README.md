@@ -5,8 +5,11 @@ DNA is, and how big the sun is!
 
 ## Official releases and downloads
 
-- iOS (iPad only) and macOS App: [SeedCalc - A Wonder
-  Calculator](https://apps.apple.com/app/seedcalc-a-wonder-calculator/id1606514630)
+- iOS (iPad only) and macOS App: [SeedCalc - A Wonder Calculator in App
+  Store](https://apps.apple.com/app/seedcalc-a-wonder-calculator/id1606514630)
+- Windows Installer: [SeedCalc - A Wonder Calculator for
+  Windows](https://github.com/SeedV/SeedCalc/releases/download/v1.0.0%2B3/SeedCalcWinSetup_v1.0.0.3.exe)
+  - sha1sum: `c59739474cc4ef6bad0a7496e6dc39525cd0bf12`
 
 ![Screenshot1](./Screenshots/01_en.jpg)
 
