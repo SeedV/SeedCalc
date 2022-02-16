@@ -266,6 +266,7 @@ namespace SeedCalc {
       }
       Indicator.SetValue(MathUtils.OrderOfMagnitudeUpperBound(number), number);
       _currentLevel = -1;
+      PlaySound(JumpToSound);
     }
 
     private void SetupRefObjs() {
