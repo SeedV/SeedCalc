@@ -80,6 +80,78 @@ namespace SeedCalc {
     public const string N7 = "7";
     public const string N8 = "8";
     public const string N9 = "9";
+
+    // Tries to map keyboard events to an calculator input. Returns null if no mapping is found.
+    public static string MapKeyboardInput() {
+      if (Input.GetKeyDown(KeyCode.Escape)) {
+        return AllClear;
+      } else if (ShiftPressed() && Input.GetKeyDown(KeyCode.Alpha9)) {
+        return LeftParenthsis;
+      } else if (ShiftPressed() && Input.GetKeyDown(KeyCode.Alpha0)) {
+        return RightParenthsis;
+      } else if (Input.GetKeyDown(KeyCode.Delete) ||
+                 Input.GetKeyDown(KeyCode.Backspace)) {
+        return Del;
+      } else if (Input.GetKeyDown(KeyCode.Plus) ||
+                 Input.GetKeyDown(KeyCode.KeypadPlus) ||
+                 (ShiftPressed() && Input.GetKeyDown(KeyCode.Equals))) {
+        return Add;
+      } else if (Input.GetKeyDown(KeyCode.Minus) ||
+                 Input.GetKeyDown(KeyCode.KeypadMinus)) {
+        return Sub;
+      } else if (Input.GetKeyDown(KeyCode.Asterisk) ||
+                 Input.GetKeyDown(KeyCode.KeypadMultiply) ||
+                 (ShiftPressed() && Input.GetKeyDown(KeyCode.Alpha8))) {
+        return Mul;
+      } else if (Input.GetKeyDown(KeyCode.Slash) ||
+                 Input.GetKeyDown(KeyCode.KeypadDivide)) {
+        return Div;
+      } else if (Input.GetKeyDown(KeyCode.Period) ||
+                 Input.GetKeyDown(KeyCode.KeypadPeriod)) {
+        return Dot;
+      } else if (Input.GetKeyDown(KeyCode.Equals) ||
+                 Input.GetKeyDown(KeyCode.KeypadEquals) ||
+                 Input.GetKeyDown(KeyCode.Return) ||
+                 Input.GetKeyDown(KeyCode.KeypadEnter)) {
+        return Equal;
+      } else if (Input.GetKeyDown(KeyCode.Alpha0) ||
+                 Input.GetKeyDown(KeyCode.Keypad0)) {
+        return N0;
+      } else if (Input.GetKeyDown(KeyCode.Alpha1) ||
+                 Input.GetKeyDown(KeyCode.Keypad1)) {
+        return N1;
+      } else if (Input.GetKeyDown(KeyCode.Alpha2) ||
+                 Input.GetKeyDown(KeyCode.Keypad2)) {
+        return N2;
+      } else if (Input.GetKeyDown(KeyCode.Alpha3) ||
+                 Input.GetKeyDown(KeyCode.Keypad3)) {
+        return N3;
+      } else if (Input.GetKeyDown(KeyCode.Alpha4) ||
+                 Input.GetKeyDown(KeyCode.Keypad4)) {
+        return N4;
+      } else if (Input.GetKeyDown(KeyCode.Alpha5) ||
+                 Input.GetKeyDown(KeyCode.Keypad5)) {
+        return N5;
+      } else if (Input.GetKeyDown(KeyCode.Alpha6) ||
+                 Input.GetKeyDown(KeyCode.Keypad6)) {
+        return N6;
+      } else if (Input.GetKeyDown(KeyCode.Alpha7) ||
+                 Input.GetKeyDown(KeyCode.Keypad7)) {
+        return N7;
+      } else if (Input.GetKeyDown(KeyCode.Alpha8) ||
+                 Input.GetKeyDown(KeyCode.Keypad8)) {
+        return N8;
+      } else if (Input.GetKeyDown(KeyCode.Alpha9) ||
+                 Input.GetKeyDown(KeyCode.Keypad9)) {
+        return N9;
+      } else {
+        return null;
+      }
+    }
+
+    private static bool ShiftPressed() {
+      return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+    }
   }
 
   // The calculator class. It is a ViewModel class that manages the underlying calculation states,
