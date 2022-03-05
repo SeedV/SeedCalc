@@ -15,6 +15,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Localization.Settings;
 using UnityEngine.UI;
 using AgileMvvm;
@@ -40,6 +41,9 @@ namespace SeedCalc {
         PlayClickSound();
         _calculator.OnInput(input);
       }
+      // Cancels the UI focus on the clicked button, otherwise, the following ENTER key would
+      // trigger the same button click event.
+      EventSystem.current.SetSelectedGameObject(null);
     }
 
     public void OnOpenAbout() {
@@ -133,6 +137,15 @@ namespace SeedCalc {
     IEnumerator Start() {
       yield return LocalizationSettings.InitializationOperation;
       LocalizationUtils.DetectAndSetLocale();
+    }
+
+    void Update() {
+      if (_calculator.AcceptingInput) {
+        string input = CalculatorInput.MapKeyboardInput();
+        if (!(input is null)) {
+          _calculator.OnInput(input);
+        }
+      }
     }
 
     private void SetButtonState(Button button, bool active) {
