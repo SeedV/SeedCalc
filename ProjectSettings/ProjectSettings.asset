@@ -147,7 +147,7 @@ PlayerSettings:
     16:10: 1
     16:9: 1
     Others: 1
-  bundleVersion: 1.0.0
+  bundleVersion: 1.1.0
   preloadedAssets:
   - {fileID: 11400000, guid: e0776128e76a44cf598fa592b6e5bbf3, type: 2}
   metroInputSource: 0
@@ -170,8 +170,8 @@ PlayerSettings:
     Standalone: com.SeedV.SeedCalc
     iPhone: com.SeedV.SeedCalc
   buildNumber:
-    Standalone: 3
-    iPhone: 2
+    Standalone: 1
+    iPhone: 1
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
   AndroidBundleVersionCode: 1
@@ -762,7 +762,9 @@ PlayerSettings:
   switchPlayerConnectionEnabled: 1
   switchUseNewStyleFilepaths: 0
   switchUseMicroSleepForYield: 1
+  switchEnableRamDiskSupport: 0
   switchMicroSleepForYieldTime: 25
+  switchRamDiskSpaceSize: 12
   ps4NPAgeRating: 12
   ps4NPTitleSecret: 
   ps4NPTrophyPackPath: 
