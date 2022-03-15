@@ -143,6 +143,7 @@ namespace SeedCalc {
       if (_calculator.AcceptingInput) {
         string input = CalculatorInput.MapKeyboardInput();
         if (!(input is null)) {
+          PlayClickSound();
           _calculator.OnInput(input);
         }
       }
