@@ -43,6 +43,12 @@ PlayerSettings:
   - logo: {fileID: 21300000, guid: b4aea05b867634bceb7913866e343f30, type: 3}
     duration: 2
   m_VirtualRealitySplashScreen: {fileID: 0}
+  m_ShowUnitySplashAds: 0
+  m_AdsAndroidGameId: 
+  m_AdsIosGameId: 
+  m_ShowSplashAdsSlogan: 0
+  m_SloganImage: {fileID: 0}
+  m_SloganHeight: 150
   m_HolographicTrackingLossScreen: {fileID: 0}
   defaultScreenWidth: 1600
   defaultScreenHeight: 1200
@@ -87,6 +93,11 @@ PlayerSettings:
   hideHomeButton: 0
   submitAnalytics: 1
   usePlayerLog: 1
+  autoStreaming: 0
+  useAnimationStreaming: 0
+  useFontStreaming: 0
+  autoStreamingId: 
+  instantGameAppId: 
   bakeCollisionMeshes: 0
   forceSingleInstance: 0
   useFlipModelSwapchain: 1
@@ -159,7 +170,7 @@ PlayerSettings:
     Standalone: com.SeedV.SeedCalc
     iPhone: com.SeedV.SeedCalc
   buildNumber:
-    Standalone: 1
+    Standalone: 2
     iPhone: 2
     tvOS: 0
   overrideDefaultApplicationIdentifier: 0
@@ -538,6 +549,7 @@ PlayerSettings:
   - m_BuildTarget: WebGL
     m_StaticBatching: 0
     m_DynamicBatching: 0
+  m_BuildTargetSecurityBuild: []
   m_BuildTargetGraphicsJobs:
   - m_BuildTarget: MacStandaloneSupport
     m_GraphicsJobs: 0
