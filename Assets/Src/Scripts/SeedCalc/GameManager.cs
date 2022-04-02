@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization.Settings;
@@ -35,6 +36,7 @@ namespace SeedCalc {
     private Button _soundSwitchButton = null;
     private GameObject _soundOnText = null;
     private GameObject _soundOffText = null;
+    private TMP_Text _aboutVersionText = null;
 
     public void OnClickButton(string input) {
       if (_calculator.AcceptingInput) {
@@ -132,6 +134,11 @@ namespace SeedCalc {
       Debug.Assert(!(_soundOnText is null));
       _soundOffText = _soundSwitchButton.transform.Find("SoundOffText")?.gameObject;
       Debug.Assert(!(_soundOffText is null));
+
+      bk = AboutDialog.transform.Find("Background");
+      _aboutVersionText = bk.Find("AboutVersionText")?.gameObject.GetComponent<TMP_Text>();
+      Debug.Assert(!(_aboutVersionText is null));
+      _aboutVersionText.text = $"v{Application.version}";
     }
 
     IEnumerator Start() {
